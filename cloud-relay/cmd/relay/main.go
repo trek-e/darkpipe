@@ -14,7 +14,9 @@ import (
 
 	"github.com/darkpipe/darkpipe/cloud-relay/relay/config"
 	"github.com/darkpipe/darkpipe/cloud-relay/relay/forward"
+	"github.com/darkpipe/darkpipe/cloud-relay/relay/notify"
 	"github.com/darkpipe/darkpipe/cloud-relay/relay/smtp"
+	"github.com/darkpipe/darkpipe/cloud-relay/relay/tls"
 )
 
 func main() {
@@ -27,7 +29,39 @@ func main() {
 		log.Fatalf("Failed to load config: %v", err)
 	}
 
-	log.Printf("Config: listen=%s transport=%s home=%s", cfg.ListenAddr, cfg.TransportType, cfg.HomeDeviceAddr)
+	log.Printf("Config: listen=%s transport=%s home=%s strict_mode=%v webhook=%v",
+		cfg.ListenAddr, cfg.TransportType, cfg.HomeDeviceAddr, cfg.StrictModeEnabled, cfg.WebhookURL != "")
+
+	// Set up notification system if webhook is configured
+	var notifier notify.Notifier
+	if cfg.WebhookURL != "" {
+		log.Printf("Enabling webhook notifications to %s", cfg.WebhookURL)
+		webhookNotifier := notify.NewWebhookNotifier(cfg.WebhookURL)
+		notifier = notify.NewMultiNotifier(webhookNotifier)
+		defer notifier.Close()
+	} else {
+		// Use a no-op notifier if webhook is not configured
+		notifier = &noopNotifier{}
+	}
+
+	// Apply strict mode configuration if enabled
+	if cfg.StrictModeEnabled {
+		log.Println("Applying strict TLS mode to Postfix...")
+		strictMode := tls.NewStrictMode(true)
+		if err := strictMode.GeneratePolicyMap(); err != nil {
+			log.Printf("WARNING: Failed to generate TLS policy map: %v", err)
+		}
+		if err := strictMode.ApplyToPostfix(); err != nil {
+			log.Printf("WARNING: Failed to apply strict mode to Postfix: %v", err)
+		}
+	}
+
+	// TLS monitor infrastructure is ready
+	// The actual log monitoring will be set up in Task 2 when we modify entrypoint.sh
+	// to pipe Postfix logs to the monitor
+	if notifier != nil {
+		log.Println("TLS monitor ready (will be activated via entrypoint.sh)")
+	}
 
 	// Create appropriate forwarder based on transport type
 	var forwarder forward.Forwarder
@@ -59,10 +93,10 @@ func main() {
 		<-sigChan
 
 		log.Println("Shutdown signal received, stopping server...")
-		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-		defer cancel()
+		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer shutdownCancel()
 
-		if err := server.Shutdown(ctx); err != nil {
+		if err := server.Shutdown(shutdownCtx); err != nil {
 			log.Printf("Server shutdown error: %v", err)
 		}
 	}()
@@ -73,4 +107,15 @@ func main() {
 	}
 
 	log.Println("Relay daemon stopped")
+}
+
+// noopNotifier is a no-op notifier used when webhook notifications are disabled.
+type noopNotifier struct{}
+
+func (n *noopNotifier) Send(ctx context.Context, event notify.Event) error {
+	return nil
+}
+
+func (n *noopNotifier) Close() error {
+	return nil
 }
