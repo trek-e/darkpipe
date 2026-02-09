@@ -1,0 +1,29 @@
+# Maddy Alias Mapping File
+# Format: alias@domain: target@domain
+#
+# This file maps alias addresses to real mailbox addresses.
+# Multiple aliases can point to the same target.
+# Multi-target aliases: alias@domain: target1@domain,target2@domain
+#
+# After editing this file, restart Maddy to apply changes.
+#
+# CATCH-ALL WARNING:
+# Catch-all addresses (@domain: target@domain) accept ALL undefined mail
+# for a domain, including spam. Enable Rspamd (Plan 03) before using
+# catch-all in production.
+
+# ============================================================================
+# Aliases for example.com
+# ============================================================================
+
+# Admin and support aliases -> alice@example.com
+admin@example.com: alice@example.com
+support@example.com: alice@example.com
+
+# ============================================================================
+# Catch-all for example.org
+# ============================================================================
+
+# All undefined addresses at example.org -> bob@example.org
+# WARNING: This will accept spam. Enable Rspamd before production use.
+@example.org: bob@example.org

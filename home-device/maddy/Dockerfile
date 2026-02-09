@@ -8,6 +8,9 @@ FROM foxcpp/maddy:0.8.2
 # Copy custom configuration
 COPY maddy.conf /data/maddy.conf
 
+# Copy alias mapping file
+COPY aliases /data/aliases
+
 # Expose mail server ports
 EXPOSE 25 587 993
 

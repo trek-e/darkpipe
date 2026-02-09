@@ -125,6 +125,25 @@ relay = [ { if = "rcpt_domain", in-list = "sql/domains" } ]
 # Reject all other domains
 default = "reject"
 
+# ============================================================================
+# Catch-all Configuration
+# ============================================================================
+#
+# Catch-all addresses redirect unmatched recipients to a designated mailbox.
+# Example: *@example.org -> bob@example.org
+#
+# Catch-all is configured per-domain via directory settings.
+# Use REST API to set catch-all for a domain:
+#
+#   curl -X PUT http://localhost:8080/api/v1/domain/example.org \
+#     -H "Authorization: Basic admin:changeme" \
+#     -H "Content-Type: application/json" \
+#     -d '{"catchAll": "bob@example.org"}'
+#
+# WARNING: Catch-all accepts ALL mail for the domain, including spam.
+# Enable spam filtering (Rspamd in Plan 03) before using catch-all in production.
+# Without spam filtering, catch-all mailboxes will receive large volumes of spam.
+
 [session.data]
 # Maximum message size: 50MB (matches cloud relay RELAY_MAX_MESSAGE_BYTES)
 max-size = 52428800

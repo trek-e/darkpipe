@@ -1,0 +1,41 @@
+# Postfix Virtual Alias Mapping
+# Format: alias@domain  target@domain
+#
+# This file maps alias addresses to real mailbox addresses.
+# Aliases are resolved BEFORE virtual_mailbox_maps lookup.
+#
+# Multiple aliases can point to the same target.
+# Multi-target aliases (mailing lists):
+#   listname@domain  user1@domain,user2@domain,user3@domain
+#
+# After editing this file, run: postmap lmdb:/etc/postfix/virtual
+#
+# CRITICAL ANTI-PATTERNS (from research):
+# 1. Do NOT add catch-all domains to virtual_alias_domains
+#    Catch-all domains MUST stay in virtual_mailbox_domains
+#    The @domain catch-all entry works within virtual_mailbox_domains
+# 2. Aliases are in virtual_alias_maps (this file)
+#    Mailboxes are in virtual_mailbox_maps (vmailbox file)
+#    These are separate files with separate purposes
+#
+# CATCH-ALL WARNING:
+# Catch-all addresses (@domain) accept ALL undefined mail for a domain,
+# including spam. Enable Rspamd (Plan 03) before using catch-all in
+# production. Without spam filtering, catch-all mailboxes will receive
+# large volumes of spam.
+
+# ============================================================================
+# Aliases for example.com
+# ============================================================================
+
+# Admin and support aliases -> alice@example.com
+admin@example.com    alice@example.com
+support@example.com  alice@example.com
+
+# ============================================================================
+# Catch-all for example.org
+# ============================================================================
+
+# All undefined addresses at example.org -> bob@example.org
+# WARNING: This will accept spam. Enable Rspamd before production use.
+@example.org         bob@example.org

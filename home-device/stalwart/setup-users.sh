@@ -88,10 +88,53 @@ echo "    Quota: 10GB per user"
 echo ""
 
 # ============================================================================
-# Add Aliases (will be configured in Task 2)
+# Add Aliases
 # ============================================================================
 
-echo "==> Alias setup will be added in Task 2"
+echo "==> Adding aliases"
+
+# Add admin@example.com -> alice@example.com alias
+curl -X POST "${STALWART_API}/api/v1/account" \
+  -u "${AUTH}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "type": "alias",
+    "email": "admin@example.com",
+    "memberOf": ["alice@example.com"],
+    "description": "Admin alias to Alice"
+  }' \
+  -w "\n" || echo "    (alias may already exist)"
+
+# Add support@example.com -> alice@example.com alias
+curl -X POST "${STALWART_API}/api/v1/account" \
+  -u "${AUTH}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "type": "alias",
+    "email": "support@example.com",
+    "memberOf": ["alice@example.com"],
+    "description": "Support alias to Alice"
+  }' \
+  -w "\n" || echo "    (alias may already exist)"
+
+echo "    Aliases added: admin@example.com -> alice@example.com, support@example.com -> alice@example.com"
+echo ""
+
+# ============================================================================
+# Configure Catch-all
+# ============================================================================
+
+echo "==> Configuring catch-all"
+
+# Set catch-all for example.org domain -> bob@example.org
+curl -X PUT "${STALWART_API}/api/v1/domain/example.org" \
+  -u "${AUTH}" \
+  -H "Content-Type: application/json" \
+  -d '{"catchAll": "bob@example.org"}' \
+  -w "\n" || echo "    (catch-all may already be configured)"
+
+echo "    Catch-all configured: *@example.org -> bob@example.org"
+echo "    WARNING: Catch-all increases spam load. Enable Rspamd (Plan 03) before production use."
 echo ""
 
 # ============================================================================
@@ -108,7 +151,20 @@ echo "Domains configured:"
 echo "  - example.com"
 echo "  - example.org"
 echo ""
+echo "Aliases configured:"
+echo "  - admin@example.com -> alice@example.com"
+echo "  - support@example.com -> alice@example.com"
+echo ""
+echo "Catch-all configured:"
+echo "  - *@example.org -> bob@example.org"
+echo ""
 echo "IMPORTANT: Change default passwords after deployment!"
+echo ""
+echo "Test alias delivery:"
+echo "  # Send to admin@example.com, should be delivered to alice@example.com"
+echo ""
+echo "Test catch-all delivery:"
+echo "  # Send to anything@example.org, should be delivered to bob@example.org"
 echo ""
 echo "Test IMAP login:"
 echo "  openssl s_client -connect localhost:993 -quiet"

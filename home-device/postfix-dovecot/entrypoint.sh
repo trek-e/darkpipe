@@ -73,13 +73,12 @@ else
   exit 1
 fi
 
-# Check if virtual alias map exists (will be populated in Task 2)
-if [ ! -f /etc/postfix/virtual ]; then
-  # Create empty virtual alias map (aliases added in Task 2)
-  touch /etc/postfix/virtual
-  echo "    Created empty virtual alias map"
-else
+# Check if virtual alias map exists
+if [ -f /etc/postfix/virtual ]; then
   echo "    Using existing virtual alias map"
+else
+  echo "    ERROR: virtual alias map not found at /etc/postfix/virtual"
+  exit 1
 fi
 
 # Convert text map files to LMDB database format
