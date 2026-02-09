@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-08)
 ## Current Position
 
 Phase: 3 of 9 (Home Mail Server)
-Plan: 1 of 3 in current phase
+Plan: 2 of 3 in current phase
 Status: In Progress
-Last activity: 2026-02-09 -- Completed 03-01-PLAN.md (Home mail server foundation)
+Last activity: 2026-02-09 -- Completed 03-02-PLAN.md (User and domain management)
 
-Progress: [██████░░░░] 56%
+Progress: [██████░░░░] 62%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 7
+- Total plans completed: 8
 - Average duration: 5.9 minutes
-- Total execution time: 0.68 hours
+- Total execution time: 0.76 hours
 
 **By Phase:**
 
@@ -29,11 +29,11 @@ Progress: [██████░░░░] 56%
 |-------|-------|-------|----------|
 | 01 (Transport Layer) | 3 | 889s | 296s |
 | 02 (Cloud Relay) | 3 | 1142s | 381s |
-| 03 (Home Mail Server) | 1 | 300s | 300s |
+| 03 (Home Mail Server) | 2 | 606s | 303s |
 
 **Recent Trend:**
-- Last 5 plans: 234s, 366s, 542s, 300s
-- Trend: Configuration plans faster (5 min), test suite plans slower (9 min)
+- Last 5 plans: 366s, 542s, 300s, 306s
+- Trend: Configuration plans consistent (~5 min), test suite plans slower (9 min)
 
 *Updated after each plan completion*
 
@@ -79,6 +79,11 @@ Recent decisions affecting current work:
 - [Phase 03-01]: LMDB format for Postfix maps (BerkleyDB deprecated in Alpine 3.13+)
 - [Phase 03-01]: Self-signed TLS for IMAP/submission within WireGuard tunnel
 - [Phase 03-01]: Virtual mailbox domains only (vmail UID/GID 5000, no system users)
+- [Phase 03-02]: Email address (user@domain) as username for uniform interface across all mail servers
+- [Phase 03-02]: Multi-domain via virtual_mailbox_domains (Postfix), local_domains (Maddy), REST API (Stalwart)
+- [Phase 03-02]: Aliases resolved before mailbox delivery (admin@example.com -> alice@example.com)
+- [Phase 03-02]: Catch-all requires spam filtering (@example.org -> bob@example.org with Rspamd prerequisite)
+- [Phase 03-02]: Postfix domains only in virtual_mailbox_domains (NOT virtual_alias_domains, avoids anti-pattern)
 
 ### Pending Todos
 
@@ -93,6 +98,6 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-09
-Stopped at: Completed 03-01-PLAN.md (Home mail server foundation with three selectable options)
-Resume file: .planning/phases/03-home-mail-server/03-01-SUMMARY.md
-Next plan: 03-02-PLAN.md (User and domain management)
+Stopped at: Completed 03-02-PLAN.md (User and domain management with multi-user, multi-domain, aliases, catch-all)
+Resume file: .planning/phases/03-home-mail-server/03-02-SUMMARY.md
+Next plan: 03-03-PLAN.md (Spam filtering)
