@@ -50,12 +50,12 @@ Plans:
   3. Cloud relay container image is under 50MB and runs on a $5/month VPS with less than 256MB RAM usage
   4. When a remote mail server connects without TLS support, the user receives a notification, and if strict mode is enabled, the connection is refused
   5. No mail content persists on the cloud relay filesystem after successful forwarding to the home device
-**Plans**: TBD
+**Plans:** 3 plans
 
 Plans:
-- [ ] 02-01: Postfix relay-only container with inbound/outbound SMTP
-- [ ] 02-02: TLS enforcement, strict mode, and Let's Encrypt automation
-- [ ] 02-03: Ephemeral forwarding and container optimization
+- [ ] 02-01-PLAN.md -- Postfix relay-only container with Go SMTP relay daemon bridging to WireGuard/mTLS transport
+- [ ] 02-02-PLAN.md -- TLS enforcement, strict mode, notification system, and Let's Encrypt certbot automation
+- [ ] 02-03-PLAN.md -- Ephemeral storage verification, container optimization, and comprehensive test suite
 
 ### Phase 3: Home Mail Server
 **Goal**: Users access their email through standard IMAP clients and send mail via SMTP submission, with all messages stored on their own hardware with spam filtering, multi-user support, and multi-domain capability
@@ -179,8 +179,8 @@ Note: Phases 5 and 6 can execute in parallel after their dependencies are met. P
 
 | Phase | Plans Complete | Status | Completed |
 |-------|---------------|--------|-----------|
-| 1. Transport Layer | 0/3 | Planned | - |
-| 2. Cloud Relay | 0/3 | Not started | - |
+| 1. Transport Layer | 3/3 | Complete | 2026-02-09 |
+| 2. Cloud Relay | 0/3 | Planned | - |
 | 3. Home Mail Server | 0/3 | Not started | - |
 | 4. DNS & Email Authentication | 0/3 | Not started | - |
 | 5. Queue & Offline Handling | 0/2 | Not started | - |
