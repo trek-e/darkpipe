@@ -1,0 +1,9 @@
+[Unit]
+Description=Certificate renewal for %I
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecCondition=/usr/local/bin/step certificate needs-renewal /etc/darkpipe/certs/%i.crt
+ExecStart=/usr/local/bin/step ca renew --force /etc/darkpipe/certs/%i.crt /etc/darkpipe/certs/%i.key
+ExecStartPost=/bin/systemctl reload %i.service 2>/dev/null || true
