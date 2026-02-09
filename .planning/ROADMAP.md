@@ -12,7 +12,7 @@ DarkPipe delivers email sovereignty by splitting the mail stack across a minimal
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Transport Layer** - Encrypted tunnel between cloud relay and home device with NAT traversal
+- [x] **Phase 1: Transport Layer** - Encrypted tunnel between cloud relay and home device with NAT traversal (completed 2026-02-09)
 - [ ] **Phase 2: Cloud Relay** - Minimal internet-facing SMTP gateway that receives and forwards mail
 - [ ] **Phase 3: Home Mail Server** - Full-featured mail server with IMAP access on user-owned hardware
 - [ ] **Phase 4: DNS & Email Authentication** - Automated SPF/DKIM/DMARC setup and DNS provider integration
@@ -36,9 +36,9 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans:** 3 plans
 
 Plans:
-- [ ] 01-01-PLAN.md -- WireGuard tunnel foundation: Go module, config generation, deployment scripts, systemd auto-restart
-- [ ] 01-02-PLAN.md -- mTLS alternative transport and internal CA: step-ca PKI, mTLS server/client, cert renewal automation
-- [ ] 01-03-PLAN.md -- Auto-reconnection hardening: WireGuard health monitoring, outage simulation, VPS provider guide
+- [x] 01-01-PLAN.md -- WireGuard tunnel foundation: Go module, config generation, deployment scripts, systemd auto-restart
+- [x] 01-02-PLAN.md -- mTLS alternative transport and internal CA: step-ca PKI, mTLS server/client, cert renewal automation
+- [x] 01-03-PLAN.md -- Auto-reconnection hardening: WireGuard health monitoring, outage simulation, VPS provider guide
 
 ### Phase 2: Cloud Relay
 **Goal**: An internet-facing SMTP gateway receives inbound mail and sends outbound mail with TLS encryption, forwarding everything to the home device without storing messages persistently

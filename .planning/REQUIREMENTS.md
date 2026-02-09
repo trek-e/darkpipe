@@ -20,15 +20,15 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Transport Security
 
-- [ ] **TRNS-01**: Encrypted WireGuard tunnel from cloud relay to home device
-- [ ] **TRNS-02**: Alternative mTLS transport option (user-selectable)
-- [ ] **TRNS-03**: Transport auto-reconnects after home internet interruption
-- [ ] **TRNS-04**: NAT traversal without port forwarding on home network
+- [x] **TRNS-01**: Encrypted WireGuard tunnel from cloud relay to home device
+- [x] **TRNS-02**: Alternative mTLS transport option (user-selectable)
+- [x] **TRNS-03**: Transport auto-reconnects after home internet interruption
+- [x] **TRNS-04**: NAT traversal without port forwarding on home network
 
 ### Certificate Management
 
 - [ ] **CERT-01**: Let's Encrypt certificates via Certbot for public-facing TLS
-- [ ] **CERT-02**: Internal CA (step-ca) for relay↔home transport certificates
+- [x] **CERT-02**: Internal CA (step-ca) for relay↔home transport certificates
 - [ ] **CERT-03**: Configurable certificate rotation (30/60/90 days)
 - [ ] **CERT-04**: Certificate expiry monitoring with alerts
 
@@ -178,11 +178,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TRNS-01 | Phase 1: Transport Layer | Pending |
-| TRNS-02 | Phase 1: Transport Layer | Pending |
-| TRNS-03 | Phase 1: Transport Layer | Pending |
-| TRNS-04 | Phase 1: Transport Layer | Pending |
-| CERT-02 | Phase 1: Transport Layer | Pending |
+| TRNS-01 | Phase 1: Transport Layer | ✓ Complete |
+| TRNS-02 | Phase 1: Transport Layer | ✓ Complete |
+| TRNS-03 | Phase 1: Transport Layer | ✓ Complete |
+| TRNS-04 | Phase 1: Transport Layer | ✓ Complete |
+| CERT-02 | Phase 1: Transport Layer | ✓ Complete |
 | RELAY-01 | Phase 2: Cloud Relay | Pending |
 | RELAY-02 | Phase 2: Cloud Relay | Pending |
 | RELAY-03 | Phase 2: Cloud Relay | Pending |
