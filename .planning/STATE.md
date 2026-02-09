@@ -5,33 +5,34 @@
 See: .planning/PROJECT.md (updated 2026-02-08)
 
 **Core value:** Your email lives on your hardware, encrypted in transit, never stored on someone else's server -- and it still works like normal email from the outside.
-**Current focus:** Phase 1 - Transport Layer
+**Current focus:** Phase 2 - Cloud Relay
 
 ## Current Position
 
-Phase: 1 of 9 (Transport Layer)
-Plan: 3 of 3 in current phase
-Status: Phase Complete
-Last activity: 2026-02-09 -- Completed Phase 01 (Transport Layer) - all 3 plans executed
+Phase: 2 of 9 (Cloud Relay)
+Plan: 1 of 3 in current phase
+Status: In Progress
+Last activity: 2026-02-09 -- Completed 02-01-PLAN.md (cloud relay core)
 
-Progress: [███░░░░░░░] 33%
+Progress: [████░░░░░░] 40%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3
-- Average duration: 4.0 minutes
-- Total execution time: 0.20 hours
+- Total plans completed: 4
+- Average duration: 4.7 minutes
+- Total execution time: 0.31 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01 (Transport Layer) | 3 | 889s | 296s |
+| 02 (Cloud Relay) | 1 | 234s | 234s |
 
 **Recent Trend:**
-- Last 5 plans: 270s, 422s, 197s
-- Trend: Stabilizing (hardening plan faster due to existing foundation)
+- Last 5 plans: 422s, 197s, 270s, 234s
+- Trend: Consistent execution speed (3-7 minutes per plan)
 
 *Updated after each plan completion*
 
@@ -59,6 +60,9 @@ Recent decisions affecting current work:
 - [01-03]: 5-minute health check threshold (PersistentKeepalive=25 refreshes ~2min)
 - [01-03]: Unified transport health checker for consistent WireGuard/mTLS interface
 - [01-03]: VPS provider guide prioritizes port 25 SMTP compatibility over price
+- [Phase 02-01]: Use emersion/go-smtp for both server and client sides
+- [Phase 02-01]: LMDB format for Postfix maps (BerkleyDB deprecated in Alpine)
+- [Phase 02-01]: Transport abstraction via Forwarder interface for WireGuard/mTLS flexibility
 
 ### Pending Todos
 
@@ -73,6 +77,6 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-09
-Stopped at: Completed Phase 01 (Transport Layer) - all 3 plans executed
-Resume file: .planning/phases/01-transport-layer/01-03-SUMMARY.md
-Next phase: Phase 02 (Cloud Relay)
+Stopped at: Completed 02-01-PLAN.md (cloud relay core)
+Resume file: .planning/phases/02-cloud-relay/02-01-SUMMARY.md
+Next plan: 02-02-PLAN.md (TLS/SSL certificates)
