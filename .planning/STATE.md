@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-02-08)
 ## Current Position
 
 Phase: 1 of 9 (Transport Layer)
-Plan: 1 of 3 in current phase
+Plan: 2 of 3 in current phase
 Status: Executing
-Last activity: 2026-02-09 -- Completed 01-01-PLAN.md (WireGuard Foundation)
+Last activity: 2026-02-09 -- Completed 01-02-PLAN.md (mTLS Transport and Internal PKI)
 
-Progress: [█░░░░░░░░░] 11%
+Progress: [██░░░░░░░░] 22%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: 4.5 minutes
-- Total execution time: 0.08 hours
+- Total plans completed: 2
+- Average duration: 5.8 minutes
+- Total execution time: 0.19 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01 (Transport Layer) | 1 | 270s | 270s |
+| 01 (Transport Layer) | 2 | 692s | 346s |
 
 **Recent Trend:**
-- Last 5 plans: 270s
-- Trend: Starting (baseline)
+- Last 5 plans: 270s, 422s
+- Trend: Ramping up (mTLS more complex than WireGuard config)
 
 *Updated after each plan completion*
 
@@ -51,6 +51,10 @@ Recent decisions affecting current work:
 - [01-01]: Default PersistentKeepalive=25 for NAT traversal without port forwarding
 - [01-01]: 0600 permissions for all config files to protect private keys
 - [01-01]: Systemd auto-restart with 30s delay to prevent rapid failure loops
+- [01-02]: cenkalti/backoff/v4 as only external Go dep for mTLS reconnection
+- [01-02]: Go TLS defaults for cipher suites (TLS 1.3 + post-quantum in Go 1.24+)
+- [01-02]: Shared testutil package for cert generation across mTLS tests
+- [01-02]: Systemd timer renewal with ExecCondition needs-renewal + RandomizedDelaySec jitter
 
 ### Pending Todos
 
@@ -65,5 +69,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-09
-Stopped at: Completed Phase 01 Plan 01 (WireGuard Foundation)
-Resume file: .planning/phases/01-transport-layer/01-01-SUMMARY.md
+Stopped at: Completed Phase 01 Plan 02 (mTLS Transport and Internal PKI)
+Resume file: .planning/phases/01-transport-layer/01-02-SUMMARY.md
