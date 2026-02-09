@@ -25,6 +25,13 @@ services:
 
       RELAY_MAX_MESSAGE_BYTES: 52428800
 
+      # TLS monitoring and notifications
+      # RELAY_STRICT_MODE: false
+      # RELAY_WEBHOOK_URL: https://webhook.example.com/darkpipe
+
+      # Certbot (for Let's Encrypt certificate automation)
+      # CERTBOT_EMAIL: admin@example.com
+
     volumes:
       # Persistent Postfix queue
       - postfix-queue:/var/spool/postfix
@@ -53,3 +60,4 @@ networks:
 volumes:
   postfix-queue:
   certbot-etc:
+  certbot-var:

@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  certbot:
+    image: certbot/certbot:latest
+    container_name: darkpipe-certbot
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - ./certbot/renew-hook.sh:/etc/certbot/renew-hook.sh:ro
+    environment:
+      - CERTBOT_EMAIL=${CERTBOT_EMAIL}
+      - RELAY_HOSTNAME=${RELAY_HOSTNAME}
+    ports:
+      # Port 80 for HTTP-01 challenge (only needed during initial obtain)
+      - "80:80"
+    entrypoint: /bin/sh
+    command: >
+      -c "
+      echo 'DarkPipe certbot sidecar starting...'
+
+      # Check if certificate already exists
+      if [ ! -d /etc/letsencrypt/live/$${RELAY_HOSTNAME} ]; then
+        echo 'Obtaining initial Let'\''s Encrypt certificate...'
+        certbot certonly \
+          --standalone \
+          --agree-tos \
+          --email $${CERTBOT_EMAIL} \
+          -d $${RELAY_HOSTNAME} \
+          --non-interactive \
+          --preferred-challenges http
+
+        if [ $$? -eq 0 ]; then
+          echo 'Certificate obtained successfully'
+        else
+          echo 'ERROR: Failed to obtain certificate'
+          echo 'NOTE: Port 80 must be accessible for HTTP-01 challenge'
+          echo 'Alternative: Use DNS-01 challenge with --dns-cloudflare or similar'
+          exit 1
+        fi
+      else
+        echo 'Certificate already exists for $${RELAY_HOSTNAME}'
+      fi
+
+      # Enter renewal loop
+      echo 'Starting certificate renewal loop (checking every 12 hours)...'
+      while true; do
+        certbot renew --deploy-hook /etc/certbot/renew-hook.sh --quiet
+
+        if [ $$? -ne 0 ]; then
+          echo 'WARNING: Certificate renewal check failed'
+        fi
+
+        sleep 43200  # 12 hours
+      done
+      "
+    restart: unless-stopped
+    networks:
+      - darkpipe
+
+networks:
+  darkpipe:
+    external: true
+
+volumes:
+  certbot-etc:
+  certbot-var:

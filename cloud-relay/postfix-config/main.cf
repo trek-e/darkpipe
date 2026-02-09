@@ -30,19 +30,25 @@ transport_maps = lmdb:/etc/postfix/transport
 # Message limits
 message_size_limit = 52428800
 
-# TLS configuration (opportunistic, not enforced until Plan 02-02)
+# TLS configuration (opportunistic by default, strict mode via RELAY_STRICT_MODE env var)
 smtpd_tls_security_level = may
 smtp_tls_security_level = may
 smtp_tls_loglevel = 1
 smtpd_tls_loglevel = 1
 
-# TLS certificates (placeholder for Plan 02-02)
+# TLS certificates from Let's Encrypt (certbot sidecar)
 smtpd_tls_cert_file = /etc/letsencrypt/live/${RELAY_HOSTNAME}/fullchain.pem
 smtpd_tls_key_file = /etc/letsencrypt/live/${RELAY_HOSTNAME}/privkey.pem
 
 # TLS protocol restrictions (TLS 1.2+ only)
 smtpd_tls_mandatory_protocols = !SSLv2, !SSLv3, !TLSv1, !TLSv1.1
 smtp_tls_mandatory_protocols = !SSLv2, !SSLv3, !TLSv1, !TLSv1.1
+smtpd_tls_protocols = !SSLv2, !SSLv3, !TLSv1, !TLSv1.1
+smtp_tls_protocols = !SSLv2, !SSLv3, !TLSv1, !TLSv1.1
+
+# TLS cipher preferences and security
+tls_preempt_cipherlist = yes
+smtpd_tls_received_header = yes
 
 # TLS session cache (LMDB format, not BerkleyDB)
 smtp_tls_session_cache_database = lmdb:${data_directory}/smtp_scache
