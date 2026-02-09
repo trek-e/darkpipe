@@ -1,0 +1,119 @@
+version: '3.8'
+
+# DarkPipe Home Device Mail Server
+# Supports three mail server options via Docker Compose profiles:
+#   - Stalwart (modern, all-in-one, IMAP4rev2/JMAP/CalDAV/CardDAV)
+#   - Maddy (minimal, Go-based, single binary)
+#   - Postfix+Dovecot (traditional, battle-tested MTA+IMAP)
+#
+# Usage:
+#   docker compose --profile stalwart up -d        # Run Stalwart
+#   docker compose --profile maddy up -d           # Run Maddy
+#   docker compose --profile postfix-dovecot up -d # Run Postfix+Dovecot
+#
+# Environment variables (customize in .env or export):
+#   MAIL_DOMAIN      - Primary mail domain (e.g., example.com)
+#   MAIL_HOSTNAME    - Mail server hostname (e.g., mail.example.com)
+#   ADMIN_EMAIL      - Admin email address (e.g., admin@example.com)
+#   ADMIN_PASSWORD   - Admin password (CHANGE THIS!)
+
+services:
+  # Stalwart mail server (profile: stalwart)
+  stalwart:
+    image: stalwartlabs/stalwart:0.15.4
+    profiles: ["stalwart"]
+    container_name: stalwart
+    restart: unless-stopped
+    ports:
+      - "25:25"    # SMTP inbound (from cloud relay)
+      - "587:587"  # SMTP submission (from mail clients)
+      - "993:993"  # IMAPS (from mail clients)
+    volumes:
+      - ./stalwart/config.toml:/opt/stalwart-mail/etc/config.toml:ro
+      - mail-data:/opt/stalwart-mail/data
+    environment:
+      - MAIL_DOMAIN=${MAIL_DOMAIN:-example.com}
+      - MAIL_HOSTNAME=${MAIL_HOSTNAME:-mail.example.com}
+      - ADMIN_EMAIL=${ADMIN_EMAIL:-admin@example.com}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-changeme}
+    networks:
+      - darkpipe
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "25"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Maddy mail server (profile: maddy)
+  maddy:
+    image: foxcpp/maddy:0.8.2
+    profiles: ["maddy"]
+    container_name: maddy
+    restart: unless-stopped
+    ports:
+      - "25:25"    # SMTP inbound (from cloud relay)
+      - "587:587"  # SMTP submission (from mail clients)
+      - "993:993"  # IMAPS (from mail clients)
+    volumes:
+      - ./maddy/maddy.conf:/data/maddy.conf:ro
+      - mail-data:/data
+    environment:
+      - MAIL_DOMAIN=${MAIL_DOMAIN:-example.com}
+      - MAIL_HOSTNAME=${MAIL_HOSTNAME:-mail.example.com}
+    networks:
+      - darkpipe
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "25"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Postfix+Dovecot mail server (profile: postfix-dovecot)
+  postfix-dovecot:
+    build:
+      context: ./postfix-dovecot
+      dockerfile: Dockerfile
+    profiles: ["postfix-dovecot"]
+    container_name: postfix-dovecot
+    restart: unless-stopped
+    ports:
+      - "25:25"    # SMTP inbound (from cloud relay)
+      - "587:587"  # SMTP submission (from mail clients)
+      - "993:993"  # IMAPS (from mail clients)
+    volumes:
+      - mail-data:/var/mail/vhosts
+      - mail-config:/etc/postfix-dovecot
+    environment:
+      - MAIL_DOMAIN=${MAIL_DOMAIN:-example.com}
+      - MAIL_HOSTNAME=${MAIL_HOSTNAME:-mail.example.com}
+      - ADMIN_EMAIL=${ADMIN_EMAIL:-admin@example.com}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-changeme}
+    networks:
+      - darkpipe
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "25"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  darkpipe:
+    driver: bridge
+
+volumes:
+  mail-data:
+    driver: local
+  mail-config:
+    driver: local

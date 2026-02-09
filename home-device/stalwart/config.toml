@@ -1,0 +1,181 @@
+# Stalwart Mail Server Configuration
+# Documentation: https://stalw.art/docs/
+# Version: 0.15.4 (v1.0 expected Q2 2026)
+#
+# SECURITY NOTE: This configuration uses self-signed TLS certificates.
+# Mail clients will need to accept the certificate. For production use
+# with public DNS, replace with Let's Encrypt certificates.
+#
+# Environment variables: Use %{env:VARIABLE}% syntax
+# Example: domain = "%{env:MAIL_DOMAIN}%"
+
+# ============================================================================
+# Server Listeners
+# ============================================================================
+
+[server.listener."smtp"]
+bind = ["0.0.0.0:25"]
+protocol = "smtp"
+# SMTP inbound from cloud relay (no auth required for local delivery)
+# Cloud relay connects via WireGuard tunnel (10.8.0.x network)
+
+[server.listener."submission"]
+bind = ["0.0.0.0:587"]
+protocol = "smtp"
+tls.implicit = false  # STARTTLS on port 587
+# SMTP submission from mail clients (requires authentication)
+
+[server.listener."imap"]
+bind = ["0.0.0.0:993"]
+protocol = "imap"
+tls.implicit = true  # Implicit TLS on port 993
+
+# ============================================================================
+# TLS Configuration
+# ============================================================================
+
+[server.tls]
+# Self-signed certificate (generated automatically by Stalwart on first boot)
+# For production with public DNS, use Let's Encrypt:
+#   certificate = "file:///etc/letsencrypt/live/mail.example.com/fullchain.pem"
+#   private-key = "file:///etc/letsencrypt/live/mail.example.com/privkey.pem"
+enable = true
+implicit = false  # Use STARTTLS for submission
+
+# ============================================================================
+# Storage Backend
+# ============================================================================
+
+[storage]
+data = "sqlite"
+blob = "fs"
+lookup = "sqlite"
+fts = "sqlite"
+
+[storage.data]
+type = "sqlite"
+path = "/opt/stalwart-mail/data/index.db"
+
+[storage.blob]
+type = "fs"
+path = "/opt/stalwart-mail/data/blobs"
+
+[storage.lookup]
+type = "sqlite"
+path = "/opt/stalwart-mail/data/lookup.db"
+
+[storage.fts]
+type = "sqlite"
+path = "/opt/stalwart-mail/data/fts.db"
+
+# ============================================================================
+# Directory (User Authentication)
+# ============================================================================
+
+[directory."internal"]
+type = "internal"
+store = "data"
+
+# Users are stored in internal SQLite database
+# Create users via REST API:
+#   curl -X POST http://localhost:8080/api/v1/account \
+#     -H "Authorization: Basic ..." \
+#     -d '{"email": "user@example.com", "password": "...", "quota": 10737418240}'
+
+# ============================================================================
+# Session Configuration
+# ============================================================================
+
+[session.rcpt]
+# Relay for local domains only (no open relay)
+# Accepts mail for domains configured in directory
+relay = [ { if = "rcpt_domain", in-list = "sql/domains" } ]
+
+# Reject all other domains
+default = "reject"
+
+[session.data]
+# Maximum message size: 50MB (matches cloud relay RELAY_MAX_MESSAGE_BYTES)
+max-size = 52428800
+
+# Add Received header
+add-received = true
+add-received-spf = true
+
+# ============================================================================
+# SMTP Session Limits
+# ============================================================================
+
+[session.connect]
+# Allow connections from WireGuard subnet (10.8.0.0/24)
+# and localhost
+# Reject all others
+script = '''
+if remote_ip.is_loopback() || remote_ip.matches("10.8.0.0/24") {
+  "allow"
+} else {
+  "reject"
+}
+'''
+
+[session.ehlo]
+require = true
+reject-non-fqdn = false  # Allow EHLO from internal network
+
+# ============================================================================
+# Authentication
+# ============================================================================
+
+[session.auth]
+# Require authentication for submission (port 587)
+require = true
+directory = "internal"
+
+# Allow plain auth over TLS (safe within WireGuard tunnel)
+mechanisms = ["plain", "login"]
+
+# ============================================================================
+# Logging
+# ============================================================================
+
+[tracer.stdout]
+type = "stdout"
+level = "info"
+ansi = false  # Disable ANSI colors for container logs
+
+# Log all SMTP transactions
+enable = true
+
+# ============================================================================
+# Management API
+# ============================================================================
+
+[server.listener."management"]
+bind = ["0.0.0.0:8080"]
+protocol = "http"
+# Web UI and REST API for user/domain management
+# Access: http://localhost:8080
+# Default admin credentials: admin / changeme (CHANGE THIS!)
+
+# ============================================================================
+# Queue Configuration
+# ============================================================================
+
+[queue]
+# Retry schedule for outbound mail (when sending to other MTAs)
+retry = ["2m", "5m", "10m", "30m", "1h", "2h", "4h", "8h", "16h"]
+max-retry = 72h
+
+[queue.outbound]
+# Hostname for outbound SMTP connections
+hostname = "mail.example.com"
+
+# ============================================================================
+# Spam/Virus Filtering (Future Integration)
+# ============================================================================
+
+# Rspamd integration will be added in Phase 03 Plan 02
+# [session.data.milter."rspamd"]
+# enable = true
+# hostname = "rspamd"
+# port = 11332
