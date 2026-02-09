@@ -67,12 +67,12 @@ Plans:
   3. Multiple users each have separate mailboxes with independent credentials on the same home device
   4. Mail aliases and catch-all addresses work (email to alias@domain delivers to the configured real mailbox)
   5. Spam is filtered by Rspamd before delivery, with greylisting reducing unsolicited messages
-**Plans**: TBD
+**Plans:** 3 plans
 
 Plans:
-- [ ] 03-01: Mail server selection and IMAP/SMTP submission setup
-- [ ] 03-02: Multi-user, multi-domain, aliases, and catch-all configuration
-- [ ] 03-03: Rspamd spam filtering and greylisting
+- [ ] 03-01-PLAN.md -- Mail server foundation: Stalwart, Maddy, and Postfix+Dovecot configs with Docker compose profiles for IMAP/SMTP submission
+- [ ] 03-02-PLAN.md -- Multi-user mailboxes, multi-domain support, aliases, and catch-all configuration for all three options
+- [ ] 03-03-PLAN.md -- Rspamd spam filtering with greylisting, milter integration, and phase integration test suite
 
 ### Phase 4: DNS & Email Authentication
 **Goal**: Email sent from DarkPipe passes SPF, DKIM, and DMARC authentication at all major providers (Gmail, Outlook, Yahoo), with DNS records automated or clearly documented for manual setup
