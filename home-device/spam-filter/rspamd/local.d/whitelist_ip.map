@@ -1,0 +1,7 @@
+# IP whitelist for greylisting
+# Private networks including WireGuard tunnel (10.8.0.0/24 from cloud relay)
+# Mail from these IPs bypasses greylisting
+
+10.0.0.0/8
+172.16.0.0/12
+192.168.0.0/16

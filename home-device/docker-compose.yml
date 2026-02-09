@@ -115,6 +115,52 @@ services:
       timeout: 10s
       retries: 3
 
+  # Rspamd spam filter (shared across all mail server options)
+  rspamd:
+    image: rspamd/rspamd:latest
+    container_name: rspamd
+    restart: unless-stopped
+    ports:
+      - "11334:11334"  # Web UI (optional - for admin access to stats)
+    volumes:
+      - ./spam-filter/rspamd/local.d:/etc/rspamd/local.d:ro
+      - ./spam-filter/rspamd/override.d:/etc/rspamd/override.d:ro
+      - rspamd-data:/var/lib/rspamd
+    networks:
+      - darkpipe
+    depends_on:
+      - redis
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "11332"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Redis backend for Rspamd greylisting and statistics
+  redis:
+    image: redis:alpine
+    container_name: redis
+    restart: unless-stopped
+    volumes:
+      - ./spam-filter/redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+      - redis-data:/data
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    networks:
+      - darkpipe
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
 networks:
   darkpipe:
     driver: bridge
@@ -123,4 +169,8 @@ volumes:
   mail-data:
     driver: local
   mail-config:
+    driver: local
+  rspamd-data:
+    driver: local
+  redis-data:
     driver: local
