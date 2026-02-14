@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-08)
 ## Current Position
 
 Phase: 5 of 9 (Queue & Offline Handling)
-Plan: 1 of 2 in current phase (Complete)
-Status: In Progress
-Last activity: 2026-02-14 -- Completed 05-01 (encrypted message queue with age encryption)
+Plan: 2 of 2 in current phase (Complete)
+Status: Complete
+Last activity: 2026-02-14 -- Completed 05-02 (S3 overflow storage + Phase 5 integration tests)
 
-Progress: [████████░░] 48%
+Progress: [████████░░] 52%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 13
-- Average duration: 6.3 minutes
-- Total execution time: 1.36 hours
+- Total plans completed: 14
+- Average duration: 6.5 minutes
+- Total execution time: 1.57 hours
 
 **By Phase:**
 
@@ -31,13 +31,11 @@ Progress: [████████░░] 48%
 | 02 (Cloud Relay) | 3 | 1142s | 381s |
 | 03 (Home Mail Server) | 3 | 881s | 294s |
 | 04 (DNS & Email Auth) | 3 | 1488s | 496s |
-| 05 (Queue & Offline) | 1 | 567s | 567s |
+| 05 (Queue & Offline) | 2 | 1335s | 668s |
 
 **Recent Trend:**
-- Last 5 plans: 347s, 559s, 582s, 567s (05-01)
-- Trend: Phase 05 started - encrypted queue with age (9m 27s)
-
-*Updated after each plan completion*
+- Last 5 plans: 559s, 582s, 567s, 768s (05-02), avg: 619s
+- Trend: Phase 05 complete - Queue & Offline Handling (12m 48s avg)
 
 ## Accumulated Context
 
@@ -115,6 +113,8 @@ Recent decisions affecting current work:
 - [05-01]: Queue enabled by default (RELAY_QUEUE_ENABLED=true)
 - [05-01]: 200MB RAM limit default (leaves headroom in 256MB container)
 - [05-01]: Rate limit to 10 messages/tick to prevent thundering herd on reconnection
+- [Phase 05-02]: Hash-based S3 key generation (SHA-256 of Message-ID) to avoid special character issues
+- [Phase 05-02]: Overflow disabled by default (requires user-provided S3 credentials)
 
 ### Pending Todos
 
@@ -129,6 +129,6 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-14
-Stopped at: Completed 05-01-PLAN.md (encrypted queue with age encryption, QueuedForwarder, background processor)
-Resume file: .planning/phases/05-queue-offline-handling/05-01-SUMMARY.md
-Next plan: 05-02-PLAN.md (S3 overflow storage for full queue)
+Stopped at: Completed 05-02-PLAN.md (S3 overflow storage + Phase 5 integration tests)
+Resume file: .planning/phases/05-queue-offline-handling/05-02-SUMMARY.md
+Next plan: Phase 5 complete. Ready for Phase 6 or phase test suite.
