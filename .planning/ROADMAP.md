@@ -18,7 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 4: DNS & Email Authentication** - Automated SPF/DKIM/DMARC setup and DNS provider integration (completed 2026-02-14)
 - [x] **Phase 5: Queue & Offline Handling** - Encrypted message queuing when home device is unreachable (completed 2026-02-14)
 - [x] **Phase 6: Webmail & Groupware** - Web-based email access with calendar and contacts sync (completed 2026-02-14)
-- [ ] **Phase 7: Build System & Deployment** - GitHub Actions pipeline for user-customized multi-arch Docker images
+- [x] **Phase 7: Build System & Deployment** - GitHub Actions pipeline for user-customized multi-arch Docker images (completed 2026-02-14)
 - [ ] **Phase 8: Device Profiles & Client Setup** - Auto-generated device configuration for seamless mail client onboarding
 - [ ] **Phase 9: Monitoring & Observability** - Mail health visibility, delivery tracking, and certificate lifecycle management
 
@@ -133,9 +133,9 @@ Plans:
 **Plans:** 3 plans
 
 Plans:
-- [ ] 07-01-PLAN.md -- Dockerfile optimization (multi-arch, OCI labels, setup detection, secrets support) and GitHub Actions workflows (custom build, prebuilt, release)
-- [ ] 07-02-PLAN.md -- Interactive Go setup CLI (darkpipe-setup) with live DNS/SMTP validation, Docker Compose generation, Docker secrets management, and upgrade-aware config migration
-- [ ] 07-03-PLAN.md -- TrueNAS Scale and Unraid native app templates, platform deployment guides (RPi4, TrueNAS, Unraid, Proxmox, Synology, Mac Silicon), and phase integration test suite
+- [x] 07-01-PLAN.md -- Dockerfile optimization (multi-arch, OCI labels, setup detection, secrets support) and GitHub Actions workflows (custom build, prebuilt, release)
+- [x] 07-02-PLAN.md -- Interactive Go setup CLI (darkpipe-setup) with live DNS/SMTP validation, Docker Compose generation, Docker secrets management, and upgrade-aware config migration
+- [x] 07-03-PLAN.md -- TrueNAS Scale and Unraid native app templates, platform deployment guides (RPi4, TrueNAS, Unraid, Proxmox, Synology, Mac Silicon), and phase integration test suite
 
 ### Phase 8: Device Profiles & Client Setup
 **Goal**: Users onboard new devices (phones, tablets, desktops) to their DarkPipe mail server in under 2 minutes without manually entering server addresses, ports, or security settings
@@ -185,7 +185,7 @@ Note: Phases 5 and 6 can execute in parallel after their dependencies are met. P
 | 4. DNS & Email Authentication | 3/3 | Complete | 2026-02-14 |
 | 5. Queue & Offline Handling | 2/2 | Complete | 2026-02-14 |
 | 6. Webmail & Groupware | 2/2 | Complete | 2026-02-14 |
-| 7. Build System & Deployment | 0/3 | Planned | - |
+| 7. Build System & Deployment | 3/3 | Complete | 2026-02-14 |
 | 8. Device Profiles & Client Setup | 0/3 | Not started | - |
 | 9. Monitoring & Observability | 0/2 | Not started | - |
 

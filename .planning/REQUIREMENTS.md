@@ -213,11 +213,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | WEB-02 | Phase 6: Webmail & Groupware | ✓ Complete |
 | CAL-01 | Phase 6: Webmail & Groupware | ✓ Complete |
 | CAL-02 | Phase 6: Webmail & Groupware | ✓ Complete |
-| BUILD-01 | Phase 7: Build System & Deployment | Pending |
-| BUILD-02 | Phase 7: Build System & Deployment | Pending |
-| BUILD-03 | Phase 7: Build System & Deployment | Pending |
-| UX-01 | Phase 7: Build System & Deployment | Pending |
-| UX-03 | Phase 7: Build System & Deployment | Pending |
+| BUILD-01 | Phase 7: Build System & Deployment | ✓ Complete |
+| BUILD-02 | Phase 7: Build System & Deployment | ✓ Complete |
+| BUILD-03 | Phase 7: Build System & Deployment | ✓ Complete |
+| UX-01 | Phase 7: Build System & Deployment | ✓ Complete |
+| UX-03 | Phase 7: Build System & Deployment | ✓ Complete |
 | PROF-01 | Phase 8: Device Profiles & Client Setup | Pending |
 | PROF-02 | Phase 8: Device Profiles & Client Setup | Pending |
 | PROF-03 | Phase 8: Device Profiles & Client Setup | Pending |
