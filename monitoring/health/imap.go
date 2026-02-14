@@ -1,0 +1,32 @@
+package health
+
+import (
+	"context"
+	"fmt"
+	"net"
+	"time"
+)
+
+// CheckIMAP performs a TCP connection check to the IMAP SSL port.
+// This validates that the IMAP server is listening and accepting connections.
+func CheckIMAP(ctx context.Context) CheckResult {
+	result := CheckResult{
+		Name:   "imap",
+		Status: "ok",
+	}
+
+	// Create dialer with timeout
+	var d net.Dialer
+	d.Timeout = 2 * time.Second
+
+	conn, err := d.DialContext(ctx, "tcp", "localhost:993")
+	if err != nil {
+		result.Status = "error"
+		result.Message = fmt.Sprintf("failed to connect: %v", err)
+		return result
+	}
+	defer conn.Close()
+
+	result.Message = "IMAP port responsive"
+	return result
+}
