@@ -23,6 +23,26 @@
 		}
 	}
 
+	# Mozilla Thunderbird autoconfig (well-known path)
+	handle /.well-known/autoconfig/mail/config-v1.1.xml {
+		reverse_proxy 10.0.0.2:8090
+	}
+
+	# Microsoft Outlook autodiscover
+	handle /autodiscover/autodiscover.xml {
+		reverse_proxy 10.0.0.2:8090
+	}
+
+	# Profile download (QR code token redemption)
+	handle /profile/* {
+		reverse_proxy 10.0.0.2:8090
+	}
+
+	# QR code generation (authenticated, for webmail iframe)
+	handle /qr/* {
+		reverse_proxy 10.0.0.2:8090
+	}
+
 	# Webmail reverse proxy (default route)
 	reverse_proxy 10.0.0.2:8080 {
 		# Forward client headers
@@ -45,5 +65,25 @@
 	# Health check endpoint (optional monitoring)
 	handle /health {
 		respond "OK" 200
+	}
+}
+
+# Autoconfig subdomain for Thunderbird (autoconfig.example.com)
+{$AUTOCONFIG_DOMAINS:autoconfig.{$RELAY_DOMAIN:example.com}} {
+	handle /mail/config-v1.1.xml {
+		reverse_proxy 10.0.0.2:8090
+	}
+	handle {
+		respond "DarkPipe Autoconfig" 200
+	}
+}
+
+# Autodiscover subdomain for Outlook (autodiscover.example.com)
+{$AUTODISCOVER_DOMAINS:autodiscover.{$RELAY_DOMAIN:example.com}} {
+	handle /autodiscover/autodiscover.xml {
+		reverse_proxy 10.0.0.2:8090
+	}
+	handle {
+		respond "DarkPipe Autodiscover" 200
 	}
 }

@@ -12,11 +12,13 @@ import (
 
 // AllRecords holds all DNS records for a domain.
 type AllRecords struct {
-	Domain string
-	SPF    SPFRecord
-	DKIM   DKIMRecord
-	DMARC  DMARCRecord
-	MX     MXRecord
+	Domain             string
+	SPF                SPFRecord
+	DKIM               DKIMRecord
+	DMARC              DMARCRecord
+	MX                 MXRecord
+	SRV                []SRVRecord
+	AutodiscoverCNAMEs []DNSRecord
 }
 
 // GenerateGuide creates a markdown guide for manual DNS setup.
@@ -80,6 +82,33 @@ func GenerateGuide(records AllRecords) string {
 	sb.WriteString("**Value/Hostname:** `")
 	sb.WriteString(records.MX.Hostname)
 	sb.WriteString("`\n\n")
+
+	// SRV Records (RFC 6186)
+	if len(records.SRV) > 0 {
+		sb.WriteString("## SRV Records (Email Autodiscovery - RFC 6186)\n\n")
+		sb.WriteString("**What they do:** Enable automatic email client configuration for IMAP and SMTP. ")
+		sb.WriteString("Thunderbird, Apple Mail, and other clients use these to discover server settings.\n\n")
+		sb.WriteString("**Record Type:** `SRV`\n\n")
+		sb.WriteString("**Add these records:**\n```\n")
+		for _, srv := range records.SRV {
+			sb.WriteString(srv.String())
+			sb.WriteString("\n")
+		}
+		sb.WriteString("```\n\n")
+	}
+
+	// Autodiscover CNAMEs
+	if len(records.AutodiscoverCNAMEs) > 0 {
+		sb.WriteString("## Autodiscover CNAME Records\n\n")
+		sb.WriteString("**What they do:** Enable automatic configuration for Thunderbird (autoconfig) and Outlook (autodiscover).\n\n")
+		sb.WriteString("**Record Type:** `CNAME`\n\n")
+		sb.WriteString("**Add these records:**\n```\n")
+		for _, cname := range records.AutodiscoverCNAMEs {
+			sb.WriteString(cname.String())
+			sb.WriteString("\n")
+		}
+		sb.WriteString("```\n\n")
+	}
 
 	sb.WriteString("---\n\n")
 
@@ -150,6 +179,24 @@ func PrintRecords(w io.Writer, records AllRecords, useColor bool) {
 	fmt.Fprintf(w, "  Priority: %s\n", cyan(fmt.Sprintf("%d", records.MX.Priority)))
 	fmt.Fprintf(w, "  Value:    %s\n\n", yellow(records.MX.Hostname))
 
+	// SRV Records (RFC 6186)
+	if len(records.SRV) > 0 {
+		fmt.Fprintf(w, "%s SRV Records (Email Autodiscovery - RFC 6186)\n", green("✓"))
+		for _, srv := range records.SRV {
+			fmt.Fprintf(w, "  %s\n", yellow(srv.String()))
+		}
+		fmt.Fprintf(w, "\n")
+	}
+
+	// Autodiscover CNAMEs
+	if len(records.AutodiscoverCNAMEs) > 0 {
+		fmt.Fprintf(w, "%s Autodiscover CNAME Records\n", green("✓"))
+		for _, cname := range records.AutodiscoverCNAMEs {
+			fmt.Fprintf(w, "  %s\n", yellow(cname.String()))
+		}
+		fmt.Fprintf(w, "\n")
+	}
+
 	fmt.Fprintf(w, "%s\n", bold("Next Steps:"))
 	fmt.Fprintf(w, "1. Add these records to your DNS provider\n")
 	fmt.Fprintf(w, "2. Wait 5-15 minutes for DNS propagation\n")
@@ -158,31 +205,64 @@ func PrintRecords(w io.Writer, records AllRecords, useColor bool) {
 
 // PrintJSON outputs records in JSON format for machine parsing.
 func PrintJSON(w io.Writer, records AllRecords) error {
-	output := map[string]interface{}{
-		"domain": records.Domain,
-		"records": map[string]interface{}{
-			"spf": map[string]interface{}{
-				"type":  "TXT",
-				"name":  "@",
-				"value": records.SPF.Value,
-			},
-			"dkim": map[string]interface{}{
-				"type":  "TXT",
-				"name":  records.DKIM.Domain,
-				"value": records.DKIM.Value,
-			},
-			"dmarc": map[string]interface{}{
-				"type":  "TXT",
-				"name":  records.DMARC.Domain,
-				"value": records.DMARC.Value,
-			},
-			"mx": map[string]interface{}{
-				"type":     "MX",
-				"name":     "@",
-				"priority": records.MX.Priority,
-				"value":    records.MX.Hostname,
-			},
+	recordsMap := map[string]interface{}{
+		"spf": map[string]interface{}{
+			"type":  "TXT",
+			"name":  "@",
+			"value": records.SPF.Value,
 		},
+		"dkim": map[string]interface{}{
+			"type":  "TXT",
+			"name":  records.DKIM.Domain,
+			"value": records.DKIM.Value,
+		},
+		"dmarc": map[string]interface{}{
+			"type":  "TXT",
+			"name":  records.DMARC.Domain,
+			"value": records.DMARC.Value,
+		},
+		"mx": map[string]interface{}{
+			"type":     "MX",
+			"name":     "@",
+			"priority": records.MX.Priority,
+			"value":    records.MX.Hostname,
+		},
+	}
+
+	// Add SRV records if present
+	if len(records.SRV) > 0 {
+		srvRecords := make([]map[string]interface{}, len(records.SRV))
+		for i, srv := range records.SRV {
+			srvRecords[i] = map[string]interface{}{
+				"type":     "SRV",
+				"service":  srv.Service,
+				"proto":    srv.Proto,
+				"domain":   srv.Domain,
+				"priority": srv.Priority,
+				"weight":   srv.Weight,
+				"port":     srv.Port,
+				"target":   srv.Target,
+			}
+		}
+		recordsMap["srv"] = srvRecords
+	}
+
+	// Add autodiscover CNAMEs if present
+	if len(records.AutodiscoverCNAMEs) > 0 {
+		cnameRecords := make([]map[string]interface{}, len(records.AutodiscoverCNAMEs))
+		for i, cname := range records.AutodiscoverCNAMEs {
+			cnameRecords[i] = map[string]interface{}{
+				"type":   cname.Type,
+				"name":   cname.Name,
+				"target": cname.Target,
+			}
+		}
+		recordsMap["autodiscover_cnames"] = cnameRecords
+	}
+
+	output := map[string]interface{}{
+		"domain":  records.Domain,
+		"records": recordsMap,
 	}
 
 	encoder := json.NewEncoder(w)

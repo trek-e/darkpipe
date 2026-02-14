@@ -135,7 +135,14 @@ func runValidateOnly(ctx context.Context) error {
 
 	// Check PTR
 	ptrResult := validator.CheckPTR(ctx, *relayIP, *relayHostname)
-	allPassed := report.AllPassed && ptrResult.Pass
+
+	// Check SRV records
+	srvResult := checker.CheckSRV(ctx, *domain)
+
+	// Check Autodiscover CNAMEs
+	cnameResult := checker.CheckAutodiscoverCNAMEs(ctx, *domain, *relayHostname)
+
+	allPassed := report.AllPassed && ptrResult.Pass && srvResult.Pass && cnameResult.Pass
 
 	// Output results
 	if *jsonOutput {
@@ -144,10 +151,12 @@ func runValidateOnly(ctx context.Context) error {
 			"timestamp":  report.Timestamp.Format(time.RFC3339),
 			"all_passed": allPassed,
 			"checks": map[string]interface{}{
-				"spf":   resultToJSON(findResult(report.Results, "SPF")),
-				"dkim":  resultToJSON(findResult(report.Results, "DKIM")),
-				"dmarc": resultToJSON(findResult(report.Results, "DMARC")),
-				"mx":    resultToJSON(findResult(report.Results, "MX")),
+				"spf":               resultToJSON(findResult(report.Results, "SPF")),
+				"dkim":              resultToJSON(findResult(report.Results, "DKIM")),
+				"dmarc":             resultToJSON(findResult(report.Results, "DMARC")),
+				"mx":                resultToJSON(findResult(report.Results, "MX")),
+				"srv":               resultToJSON(srvResult),
+				"autodiscover_cname": resultToJSON(cnameResult),
 				"ptr":   ptrResultToJSON(ptrResult),
 			},
 		}
@@ -157,7 +166,7 @@ func runValidateOnly(ctx context.Context) error {
 	}
 
 	// Human-friendly output
-	printValidationResults(report.Results, ptrResult)
+	printValidationResults(report.Results, ptrResult, srvResult, cnameResult)
 
 	if allPassed {
 		color.Green("\n✓ All DNS records are configured correctly!\n")
@@ -291,7 +300,9 @@ func runFullSetup(ctx context.Context) error {
 			RUA:             *dmarcRua,
 			RUF:             *dmarcRuf,
 		}),
-		MX: records.GenerateMX(*domain, *relayHostname, 10),
+		MX:                 records.GenerateMX(*domain, *relayHostname, 10),
+		SRV:                records.GenerateSRVRecords(*domain, *relayHostname),
+		AutodiscoverCNAMEs: records.GenerateAutodiscoverCNAME(*domain, *relayHostname),
 	}
 
 	// Step 3: Output records
@@ -367,7 +378,7 @@ func ptrResultToJSON(result validator.PTRResult) map[string]interface{} {
 	}
 }
 
-func printValidationResults(results []validator.CheckResult, ptrResult validator.PTRResult) {
+func printValidationResults(results []validator.CheckResult, ptrResult validator.PTRResult, srvResult validator.CheckResult, cnameResult validator.CheckResult) {
 	green := color.New(color.FgGreen).SprintFunc()
 	red := color.New(color.FgRed).SprintFunc()
 	yellow := color.New(color.FgYellow).SprintFunc()
@@ -396,6 +407,12 @@ func printValidationResults(results []validator.CheckResult, ptrResult validator
 		fmt.Println()
 	}
 
+	// SRV result
+	printCheckResult(srvResult, green, red, yellow)
+
+	// Autodiscover CNAME result
+	printCheckResult(cnameResult, green, red, yellow)
+
 	// PTR result
 	status := red("✗ FAIL")
 	if ptrResult.Pass {
@@ -420,6 +437,28 @@ func printValidationResults(results []validator.CheckResult, ptrResult validator
 			}
 		}
 	}
+}
+
+// printCheckResult is a helper to print a single CheckResult.
+func printCheckResult(result validator.CheckResult, green, red, yellow func(...interface{}) string) {
+	status := red("✗ FAIL")
+	if result.Pass {
+		status = green("✓ PASS")
+	}
+
+	fmt.Printf("%s %s\n", status, result.RecordType)
+	fmt.Printf("  Name: %s\n", yellow(result.Name))
+
+	if result.Pass {
+		if result.Actual != "" {
+			fmt.Printf("  Value: %s\n", truncate(result.Actual, 80))
+		}
+	} else {
+		if result.Error != "" {
+			fmt.Printf("  Error: %s\n", red(result.Error))
+		}
+	}
+	fmt.Println()
 }
 
 func truncate(s string, maxLen int) string {
