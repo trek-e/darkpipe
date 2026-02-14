@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-08)
 ## Current Position
 
 Phase: 8 of 9 (Device Profiles & Client Setup)
-Plan: 2 of 3 complete
-Status: Phase 8 in progress — Profile server & QR code generation complete
-Last activity: 2026-02-14 -- Completed 08-02-PLAN.md (Profile Server & QR Code Generation)
+Plan: 3 of 3 complete
+Status: Phase 8 COMPLETE — All device onboarding components delivered
+Last activity: 2026-02-14 -- Completed 08-03-PLAN.md (Webmail Integration)
 
-Progress: [█████████░] 85%
+Progress: [█████████░] 87%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 22
-- Average duration: 5.7 minutes
-- Total execution time: 2.1 hours
+- Total plans completed: 23
+- Average duration: 5.6 minutes
+- Total execution time: 2.2 hours
 
 **By Phase:**
 
@@ -34,11 +34,11 @@ Progress: [█████████░] 85%
 | 05 (Queue & Offline) | 2 | 1335s | 668s |
 | 06 (Webmail & Groupware) | 2 | 353s | 177s |
 | 07 (Build System & Deployment) | 3 | 1245s | 415s |
-| 08 (Device Profiles & Client Setup) | 2 | 894s | 447s |
+| 08 (Device Profiles & Client Setup) | 3 | 1274s | 425s |
 
 **Recent Trend:**
-- Last 5 plans: 389s (07-02), 562s (07-03), 368s (08-01), 526s (08-02), avg: 461s
-- Trend: Phase 08 progressing — profile server & QR code generation in 8.8 min
+- Last 5 plans: 562s (07-03), 368s (08-01), 526s (08-02), 380s (08-03), avg: 459s
+- Trend: Phase 08 COMPLETE — webmail integration & tests in 6.3 min
 
 ## Accumulated Context
 
@@ -155,6 +155,12 @@ Recent decisions affecting current work:
 - [08-02]: Profile server on port 8090 (separate from webmail on 8080 for service isolation)
 - [08-02]: SRV records include _imap with target '.' (unavailable) per RFC 2782
 - [08-02]: Caddy handle directives placed BEFORE default webmail reverse_proxy (first match wins)
+- [08-03]: Profile server runs WITHOUT Docker Compose profile (always available like rspamd/redis)
+- [08-03]: 64MB memory limit for profile server (sufficient for Go HTTP server with templates)
+- [08-03]: Web UI uses Basic Auth with admin credentials (v1 simplification)
+- [08-03]: Platform-specific instructions: iOS/macOS get QR+download, Android gets QR+manual, Thunderbird/Outlook get autodiscovery
+- [08-03]: CLI QR command supports both terminal ASCII art and PNG file export
+- [08-03]: Templates and static assets embedded via embed.FS (no runtime file dependencies)
 
 ### Pending Todos
 
@@ -169,6 +175,6 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-14
-Stopped at: Completed 08-02-PLAN.md (Profile Server & QR Code Generation)
-Resume file: .planning/phases/08-device-profiles-client-setup/08-02-SUMMARY.md
-Next plan: 08-03-PLAN.md (Webmail Integration)
+Stopped at: Completed 08-03-PLAN.md (Webmail Integration) — Phase 8 COMPLETE
+Resume file: .planning/phases/08-device-profiles-client-setup/08-03-SUMMARY.md
+Next plan: Phase 09 - Monitoring & Health Checks
