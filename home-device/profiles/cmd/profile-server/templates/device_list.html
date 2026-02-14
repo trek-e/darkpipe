@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Management - DarkPipe</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>DarkPipe</h1>
+            <p class="subtitle">Device Management</p>
+        </header>
+
+        <nav>
+            <a href="/devices">My Devices</a>
+            <a href="/devices/add" class="button-primary">Add Device</a>
+        </nav>
+
+        {{if .Error}}
+        <div class="alert alert-error">{{.Error}}</div>
+        {{end}}
+
+        {{if .Success}}
+        <div class="alert alert-success">{{.Success}}</div>
+        {{end}}
+
+        <main>
+            <h2>Your Devices</h2>
+            <p class="info">Manage app passwords for your email devices. Each device has its own password for security.</p>
+
+            {{if .Devices}}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Device Name</th>
+                        <th>Created</th>
+                        <th>Last Used</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{range .Devices}}
+                    <tr>
+                        <td>{{.DeviceName}}</td>
+                        <td>{{.CreatedAt.Format "2006-01-02 15:04"}}</td>
+                        <td>
+                            {{if .LastUsedAt.IsZero}}
+                                Never
+                            {{else}}
+                                {{.LastUsedAt.Format "2006-01-02 15:04"}}
+                            {{end}}
+                        </td>
+                        <td>
+                            <form method="POST" action="/devices/revoke" onsubmit="return confirm('Are you sure you want to revoke access for this device?');" style="display: inline;">
+                                <input type="hidden" name="device_id" value="{{.ID}}">
+                                <button type="submit" class="button-danger">Revoke</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {{end}}
+                </tbody>
+            </table>
+            {{else}}
+            <p class="no-data">No devices configured yet. <a href="/devices/add">Add your first device</a>.</p>
+            {{end}}
+        </main>
+
+        <footer>
+            <p>DarkPipe - Your email, your hardware</p>
+        </footer>
+    </div>
+</body>
+</html>

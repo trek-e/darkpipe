@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Device - DarkPipe</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>DarkPipe</h1>
+            <p class="subtitle">Add New Device</p>
+        </header>
+
+        <nav>
+            <a href="/devices">My Devices</a>
+            <a href="/devices/add" class="button-primary">Add Device</a>
+        </nav>
+
+        {{if .Error}}
+        <div class="alert alert-error">{{.Error}}</div>
+        {{end}}
+
+        <main>
+            <h2>Add a New Device</h2>
+            <p class="info">Configure email on a new device. Choose your platform for optimized setup instructions.</p>
+
+            <form method="POST" action="/devices/add">
+                <div class="form-group">
+                    <label for="device_name">Device Name</label>
+                    <input type="text" id="device_name" name="device_name" required placeholder="e.g., iPhone 15, Work Laptop">
+                    <p class="help-text">Choose a name you'll recognize later</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="platform">Platform</label>
+                    <select id="platform" name="platform" required>
+                        <option value="">Select your platform...</option>
+                        <option value="ios">iOS (iPhone/iPad)</option>
+                        <option value="macos">macOS</option>
+                        <option value="android">Android</option>
+                        <option value="thunderbird">Thunderbird</option>
+                        <option value="outlook">Outlook</option>
+                        <option value="other">Other / Manual Setup</option>
+                    </select>
+                    <p class="help-text">We'll provide platform-specific setup instructions</p>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="button-primary">Generate Setup</button>
+                    <a href="/devices" class="button">Cancel</a>
+                </div>
+            </form>
+        </main>
+
+        <footer>
+            <p>DarkPipe - Your email, your hardware</p>
+        </footer>
+    </div>
+</body>
+</html>

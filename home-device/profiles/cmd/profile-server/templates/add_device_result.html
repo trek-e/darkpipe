@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Setup - DarkPipe</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>DarkPipe</h1>
+            <p class="subtitle">Device Setup</p>
+        </header>
+
+        <nav>
+            <a href="/devices">My Devices</a>
+            <a href="/devices/add">Add Another Device</a>
+        </nav>
+
+        <main>
+            <div class="success-header">
+                <h2>Device Created: {{.DeviceName}}</h2>
+                <p>Your app password has been generated</p>
+            </div>
+
+            <div class="alert alert-warning">
+                <strong>Important:</strong> This is the only time you will see this password. Save it now!
+            </div>
+
+            <div class="password-display">
+                <label>App Password:</label>
+                <code class="app-password">{{.AppPassword}}</code>
+            </div>
+
+            {{if .QRCodeData}}
+            <div class="qr-section">
+                <h3>Quick Setup</h3>
+                <p>Scan this QR code with your device:</p>
+                <img src="data:image/png;base64,{{.QRCodeData}}" alt="QR Code" class="qr-code">
+            </div>
+            {{end}}
+
+            <div class="instructions">
+                {{.Instructions}}
+            </div>
+
+            <div class="form-actions">
+                <a href="/devices" class="button-primary">Done</a>
+                <a href="/devices/add" class="button">Add Another Device</a>
+            </div>
+        </main>
+
+        <footer>
+            <p>DarkPipe - Your email, your hardware</p>
+        </footer>
+    </div>
+</body>
+</html>

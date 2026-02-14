@@ -256,6 +256,40 @@ services:
       timeout: 10s
       retries: 3
 
+  # Profile server for device onboarding (runs with all mail server configurations)
+  profile-server:
+    build:
+      context: ./profiles
+      dockerfile: Dockerfile
+    container_name: profile-server
+    restart: unless-stopped
+    ports:
+      - "8090:8090"
+    environment:
+      - PROFILE_SERVER_PORT=8090
+      - MAIL_DOMAIN=${MAIL_DOMAIN:-example.com}
+      - MAIL_HOSTNAME=${MAIL_HOSTNAME:-mail.example.com}
+      - MAIL_SERVER_TYPE=${MAIL_SERVER_TYPE:-stalwart}
+      - CALDAV_URL=${CALDAV_URL:-}
+      - CARDDAV_URL=${CARDDAV_URL:-}
+      - ADMIN_USER=${ADMIN_EMAIL:-admin@example.com}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-changeme}
+      - STALWART_ADMIN_USER=${ADMIN_EMAIL:-admin@example.com}
+      - STALWART_ADMIN_PASSWORD=${ADMIN_PASSWORD:-changeme}
+    volumes:
+      - profile-data:/data
+    networks:
+      - darkpipe
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8090/health", "||", "exit", "1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
 networks:
   darkpipe:
     driver: bridge
@@ -274,4 +308,6 @@ volumes:
   snappymail-data:
     driver: local
   radicale-data:
+    driver: local
+  profile-data:
     driver: local

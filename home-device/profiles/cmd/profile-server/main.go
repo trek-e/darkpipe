@@ -16,6 +16,12 @@ import (
 )
 
 func main() {
+	// Check for CLI subcommands
+	if len(os.Args) > 1 && os.Args[1] == "qr" {
+		RunQRCommand(os.Args[2:])
+		return
+	}
+
 	// Load configuration from environment
 	config := ServerConfig{
 		Domain:      getEnv("MAIL_DOMAIN", "example.com"),
@@ -77,6 +83,9 @@ func main() {
 		Config:       config,
 	}
 
+	// Create web UI handler
+	webUI := NewWebUIHandler(appPassStore, tokenStore, config)
+
 	// Setup routes
 	mux := http.NewServeMux()
 	mux.HandleFunc("/profile/download", handler.HandleProfileDownload)
@@ -85,6 +94,12 @@ func main() {
 	mux.HandleFunc("/health", handler.HandleHealth)
 	mux.HandleFunc("/qr/generate", handler.HandleQRGenerate)
 	mux.HandleFunc("/qr/image", handler.HandleQRImage)
+
+	// Web UI routes
+	mux.HandleFunc("/devices", webUI.HandleDeviceList)
+	mux.HandleFunc("/devices/add", webUI.HandleAddDevice)
+	mux.HandleFunc("/devices/revoke", webUI.HandleRevokeDevice)
+	mux.HandleFunc("/static/", webUI.ServeStatic)
 
 	// Wrap with logging middleware
 	loggedMux := LogRequest(mux)

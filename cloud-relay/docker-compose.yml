@@ -17,6 +17,8 @@ services:
       - caddy-logs:/var/log/caddy
     environment:
       WEBMAIL_DOMAINS: mail.${RELAY_DOMAIN:-example.com}
+      AUTOCONFIG_DOMAINS: autoconfig.${RELAY_DOMAIN:-example.com}
+      AUTODISCOVER_DOMAINS: autodiscover.${RELAY_DOMAIN:-example.com}
     networks:
       - darkpipe
     deploy:
