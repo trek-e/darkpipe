@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-08)
 ## Current Position
 
 Phase: 9 of 9 (Monitoring & Observability)
-Plan: 1 of 3 complete
-Status: Core monitoring packages complete — Health checks, queue stats, delivery tracking
-Last activity: 2026-02-14 -- Completed 09-01-PLAN.md (Core Monitoring Data Collection)
+Plan: 2 of 3 complete
+Status: Alert & certificate lifecycle complete — Multi-channel alerting, cert renewal, DKIM rotation
+Last activity: 2026-02-14 -- Completed 09-02-PLAN.md (Alert Notification & Certificate Lifecycle)
 
-Progress: [█████████░] 92%
+Progress: [█████████░] 95%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 24
+- Total plans completed: 25
 - Average duration: 5.5 minutes
-- Total execution time: 2.3 hours
+- Total execution time: 2.4 hours
 
 **By Phase:**
 
@@ -35,12 +35,17 @@ Progress: [█████████░] 92%
 | 06 (Webmail & Groupware) | 2 | 353s | 177s |
 | 07 (Build System & Deployment) | 3 | 1245s | 415s |
 | 08 (Device Profiles & Client Setup) | 3 | 1274s | 425s |
-| 09 (Monitoring & Observability) | 1 | 388s | 388s |
+| 09 (Monitoring & Observability) | 2 | 838s | 419s |
 
 **Recent Trend:**
-- Last 5 plans: 368s (08-01), 526s (08-02), 380s (08-03), 388s (09-01), avg: 416s
-- Trend: Phase 08 COMPLETE — webmail integration & tests in 6.3 min
-| Phase 09 P01 | 388 | 2 tasks | 14 files |
+- Last 5 plans: 526s (08-02), 380s (08-03), 388s (09-01), 450s (09-02), avg: 436s
+- Trend: Phase 09 in progress — alert & cert lifecycle in 7.5 min
+
+**Recent Plans:**
+| Phase | Plan | Duration | Tasks | Files |
+|-------|------|----------|-------|-------|
+| Phase 09 | P01 | 388s | 2 | 14 |
+| Phase 09 | P02 | 450s | 2 | 12 |
 
 ## Accumulated Context
 
@@ -172,6 +177,13 @@ Recent decisions affecting current work:
 - [09-01]: Thread-safe tracker with RWMutex for concurrent log parsing and query access
 - [09-01]: Postfix log parser extracts both inbound and outbound deliveries
 - [09-01]: Status normalization: sent->delivered for clearer user-facing language
+- [09-02]: Alert rate limiting uses simple map-based implementation (not external library) for single-process use case
+- [09-02]: Email channel uses sendmail command (assumes Postfix available on mail server)
+- [09-02]: CLI alerts written to NDJSON file for CLI consumption (/data/monitoring/cli-alerts.json)
+- [09-02]: Certificate renewal uses 2/3-lifetime rule (auto-handles Let's Encrypt 90→45 day transition)
+- [09-02]: Exponential backoff with 3 retries for transient failures, permanent error detection for ACME issues
+- [09-02]: DKIM rotation reuses Phase 4 selector format ({prefix}-{YYYY}q{Q}) with quarterly rotation
+- [09-02]: Service reload uses hot reload (postfix reload, caddy reload) to avoid interruption
 
 ### Pending Todos
 
@@ -186,6 +198,6 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-14
-Stopped at: Completed 09-01-PLAN.md (Core Monitoring Data Collection)
-Resume file: .planning/phases/09-monitoring-observability/09-01-SUMMARY.md
-Next plan: 09-02-PLAN.md (Monitoring CLI Commands)
+Stopped at: Completed 09-02-PLAN.md (Alert Notification & Certificate Lifecycle)
+Resume file: .planning/phases/09-monitoring-observability/09-02-SUMMARY.md
+Next plan: 09-03-PLAN.md (Monitoring Daemon & Integration)
