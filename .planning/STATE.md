@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-08)
 ## Current Position
 
 Phase: 4 of 9 (DNS & Email Authentication)
-Plan: 1 of 3 in current phase (In Progress)
+Plan: 2 of 3 in current phase (In Progress)
 Status: Executing
-Last activity: 2026-02-14 -- Completed 04-01-PLAN.md (DKIM keys and DNS records)
+Last activity: 2026-02-14 -- Completed 04-02-PLAN.md (DNS provider API integration)
 
-Progress: [████████░░] 37%
+Progress: [████████░░] 40%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 10
-- Average duration: 5.6 minutes
-- Total execution time: 0.92 hours
+- Total plans completed: 11
+- Average duration: 5.7 minutes
+- Total execution time: 1.05 hours
 
 **By Phase:**
 
@@ -30,11 +30,11 @@ Progress: [████████░░] 37%
 | 01 (Transport Layer) | 3 | 889s | 296s |
 | 02 (Cloud Relay) | 3 | 1142s | 381s |
 | 03 (Home Mail Server) | 3 | 881s | 294s |
-| 04 (DNS & Email Auth) | 1 | 347s | 347s |
+| 04 (DNS & Email Auth) | 2 | 906s | 453s |
 
 **Recent Trend:**
-- Last 5 plans: 300s, 306s, 275s, 347s
-- Trend: Phase 04 started, DKIM and DNS records complete (~5.8 min)
+- Last 5 plans: 306s, 275s, 347s, 559s
+- Trend: Phase 04 in progress, DNS provider API integration complete (~9.3 min)
 
 *Updated after each plan completion*
 
@@ -96,6 +96,12 @@ Recent decisions affecting current work:
 - [04-01]: DMARC p=none default for monitoring-first approach (progression: none -> quarantine -> reject)
 - [04-01]: Single-line DKIM TXT records for DNS compatibility
 - [04-01]: 0600 permissions for DKIM private keys (matches Phase 1 secrets pattern)
+- [04-02]: Provider registration via init() to avoid import cycles
+- [04-02]: Dry-run by default (--apply required for actual changes)
+- [04-02]: Auto-detection from NS records (no manual provider selection)
+- [04-02]: Propagation polling across 3 public DNS servers (Google, Cloudflare, OpenDNS)
+- [04-02]: SPF duplicate prevention (update existing SPF instead of creating second)
+- [04-02]: TXT record quoting for Route53 compatibility
 
 ### Pending Todos
 
@@ -110,6 +116,6 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-14
-Stopped at: Completed 04-01-PLAN.md (DKIM keys and DNS records)
-Resume file: .planning/phases/04-dns-email-auth/04-01-SUMMARY.md
-Next plan: 04-02-PLAN.md (DNS provider API integration)
+Stopped at: Completed 04-02-PLAN.md (DNS provider API integration)
+Resume file: .planning/phases/04-dns-email-auth/04-02-SUMMARY.md
+Next plan: 04-03-PLAN.md (dns-setup CLI)
