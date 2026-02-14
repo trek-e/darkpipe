@@ -4,6 +4,10 @@
 #   Postfix: http://www.postfix.org/
 #   Dovecot: https://doc.dovecot.org/
 
+# Build arguments for multi-architecture support and OCI labels
+ARG TARGETARCH
+ARG VERSION=dev
+
 FROM alpine:3.21
 
 # Install mail server components
@@ -36,15 +40,21 @@ RUN mkdir -p /var/mail/vhosts && \
 RUN mkdir -p /etc/ssl/mail /etc/dovecot /etc/postfix-dovecot
 
 # Copy Postfix configuration
-COPY postfix/main.cf /etc/postfix/main.cf
-COPY postfix/master.cf /etc/postfix/master.cf
+COPY home-device/postfix-dovecot/postfix/main.cf /etc/postfix/main.cf
+COPY home-device/postfix-dovecot/postfix/master.cf /etc/postfix/master.cf
 
 # Copy Dovecot configuration
-COPY dovecot/dovecot.conf /etc/dovecot/dovecot.conf
+COPY home-device/postfix-dovecot/dovecot/dovecot.conf /etc/dovecot/dovecot.conf
 
 # Copy entrypoint script
-COPY entrypoint.sh /entrypoint.sh
+COPY home-device/postfix-dovecot/entrypoint.sh /entrypoint.sh
 RUN chmod 0755 /entrypoint.sh
+
+# OCI labels for container metadata
+LABEL org.opencontainers.image.source=https://github.com/trek-e/darkpipe
+LABEL org.opencontainers.image.version=${VERSION}
+LABEL org.opencontainers.image.description="DarkPipe Home Device - Postfix+Dovecot Mail Server"
+LABEL org.opencontainers.image.licenses=AGPL-3.0
 
 # Expose mail server ports
 EXPOSE 25 587 993

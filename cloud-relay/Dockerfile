@@ -7,6 +7,10 @@
 
 FROM golang:1.24-alpine AS builder
 
+# Build arguments for multi-architecture support
+ARG TARGETARCH
+ARG VERSION=dev
+
 WORKDIR /build
 
 # Copy go.mod and go.sum first for better layer caching
@@ -16,8 +20,8 @@ RUN go mod download
 # Copy source code
 COPY . .
 
-# Build relay daemon (static binary with stripped symbols)
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o relay-daemon ./cloud-relay/cmd/relay
+# Build relay daemon (static binary with stripped symbols, reproducible build)
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=${TARGETARCH} go build -trimpath -ldflags="-s -w" -o relay-daemon ./cloud-relay/cmd/relay
 
 # Optional: UPX compression if binary exceeds 5MB (uncomment to enable)
 # RUN apk add --no-cache upx && upx --best relay-daemon
@@ -25,7 +29,10 @@ RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o relay-daemon ./cloud-r
 # Stage 2: Runtime
 FROM alpine:3.21
 
-# Install Postfix, WireGuard tools, CA certificates, and gettext (for envsubst)
+# Build arguments for OCI labels
+ARG VERSION=dev
+
+# Install Postfix, WireGuard tools, CA certificates, gettext, and netcat for health checks
 # Use --no-cache to avoid storing the apk cache layer (~20MB savings)
 # Pin Postfix version for reproducibility
 RUN apk add --no-cache \
@@ -33,6 +40,7 @@ RUN apk add --no-cache \
     ca-certificates \
     wireguard-tools \
     gettext \
+    netcat-openbsd \
     && postfix set-permissions \
     && postfix check
 
@@ -48,16 +56,17 @@ COPY cloud-relay/postfix-config/transport /etc/postfix/transport
 COPY cloud-relay/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-# Labels for container metadata
+# OCI labels for container metadata
 LABEL org.opencontainers.image.source=https://github.com/trek-e/darkpipe
+LABEL org.opencontainers.image.version=${VERSION}
 LABEL org.opencontainers.image.description="DarkPipe Cloud Relay - Ephemeral SMTP relay with WireGuard/mTLS transport"
 LABEL org.opencontainers.image.licenses=AGPL-3.0
 
 # Expose SMTP port
 EXPOSE 25
 
-# Health check using Postfix status
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-  CMD postfix status || exit 1
+# Health check using netcat (more reliable for container orchestrators)
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+  CMD nc -z localhost 25 || exit 1
 
 ENTRYPOINT ["/entrypoint.sh"]

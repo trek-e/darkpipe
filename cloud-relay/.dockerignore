@@ -62,3 +62,6 @@ __pycache__
 
 # Dependencies (will be downloaded in builder stage)
 vendor/
+
+# Home device files (not needed for cloud relay build)
+home-device/

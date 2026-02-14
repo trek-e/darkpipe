@@ -1,19 +1,65 @@
 #!/bin/bash
 # Postfix+Dovecot Entrypoint Script
 # This script:
-# 1. Generates self-signed TLS certificate if none exists
-# 2. Creates initial empty map files for Postfix
-# 3. Creates default admin user in Dovecot users file
-# 4. Starts Dovecot in background
-# 5. Starts Postfix in foreground
+# 1. Detects setup configuration and loads environment
+# 2. Supports Docker secrets via _FILE suffix convention
+# 3. Generates self-signed TLS certificate if none exists
+# 4. Creates initial empty map files for Postfix
+# 5. Creates default admin user in Dovecot users file
+# 6. Starts Dovecot in background
+# 7. Starts Postfix in foreground
 
 set -e
+
+# ============================================================================
+# Setup Detection
+# ============================================================================
+
+# Check for DarkPipe setup configuration
+if [ -f "/config/.darkpipe-configured" ]; then
+  # Load generated environment from setup script
+  [ -f "/config/home.env" ] && . /config/home.env
+fi
+
+# ============================================================================
+# Docker Secrets Support (_FILE suffix convention)
+# ============================================================================
+
+# Read secret from file if _FILE variant is set
+for var in ADMIN_PASSWORD DKIM_PRIVATE_KEY; do
+  file_var="${var}_FILE"
+  eval file_path="\$$file_var"
+  if [ -n "$file_path" ] && [ -f "$file_path" ]; then
+    eval export "$var=\$(cat \"\$file_path\" | tr -d '\n')"
+  fi
+done
+
+# ============================================================================
+# Environment Variables with Defaults
+# ============================================================================
 
 # Environment variables with defaults
 MAIL_DOMAIN="${MAIL_DOMAIN:-example.com}"
 MAIL_HOSTNAME="${MAIL_HOSTNAME:-mail.example.com}"
 ADMIN_EMAIL="${ADMIN_EMAIL:-admin@example.com}"
 ADMIN_PASSWORD="${ADMIN_PASSWORD:-changeme}"
+
+# ============================================================================
+# Validate Required Configuration
+# ============================================================================
+
+if [ -z "$MAIL_DOMAIN" ]; then
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  echo "⚠️  DarkPipe setup has not been run"
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  echo ""
+  echo "Please run the setup script first or set required environment variables."
+  echo ""
+  echo "If you have the darkpipe-setup binary:"
+  echo "  ./darkpipe-setup"
+  echo ""
+  exit 1
+fi
 
 echo "==> Starting Postfix+Dovecot mail server"
 echo "    Domain: ${MAIL_DOMAIN}"
