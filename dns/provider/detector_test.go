@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"os"
 	"testing"
 )
 
@@ -83,27 +84,23 @@ func TestNewProviderFromDetection_Unknown(t *testing.T) {
 	}
 }
 
-func TestNewProviderFromDetection_NotImplemented(t *testing.T) {
-	// Task 1 doesn't implement actual providers yet (Task 2 will)
-	// This test verifies the error message is correct
+func TestNewProviderFromDetection_NotRegistered(t *testing.T) {
+	// Providers register themselves on import
+	// Without importing them, they won't be in the registry
 	ctx := context.Background()
 
-	// Test Cloudflare detection (not yet implemented)
+	// Save and clear environment to prevent accidental auth
+	oldToken := os.Getenv("CLOUDFLARE_API_TOKEN")
+	os.Setenv("CLOUDFLARE_API_TOKEN", "")
+	defer os.Setenv("CLOUDFLARE_API_TOKEN", oldToken)
+
+	// Test Cloudflare detection - provider not imported, so not registered
 	_, err := NewProviderFromDetection(ctx, "cloudflare.com", nil)
 	if err == nil {
-		t.Error("Expected error for not-yet-implemented Cloudflare provider")
+		t.Error("Expected error for unregistered provider")
 	}
-	if err != nil && !contains(err.Error(), "not yet implemented") {
-		t.Errorf("Expected 'not yet implemented' error, got: %s", err.Error())
-	}
-
-	// Test Route53 detection (not yet implemented)
-	_, err = NewProviderFromDetection(ctx, "aws.amazon.com", nil)
-	if err == nil {
-		t.Error("Expected error for not-yet-implemented Route53 provider")
-	}
-	if err != nil && !contains(err.Error(), "not yet implemented") {
-		t.Errorf("Expected 'not yet implemented' error, got: %s", err.Error())
+	if err != nil && !contains(err.Error(), "not registered") {
+		t.Errorf("Expected 'not registered' error, got: %s", err.Error())
 	}
 }
 

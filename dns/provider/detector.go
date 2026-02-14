@@ -51,29 +51,38 @@ func DetectProvider(ctx context.Context, domain string) (string, error) {
 	return "unknown", nil
 }
 
+// ProviderFactory is a function that creates a DNS provider.
+type ProviderFactory func(ctx context.Context) (DNSProvider, error)
+
+// Global provider registry
+var providerRegistry = make(map[string]ProviderFactory)
+
+// RegisterProvider registers a provider factory for a given provider name.
+// This allows provider implementations to register themselves without creating import cycles.
+func RegisterProvider(name string, factory ProviderFactory) {
+	providerRegistry[name] = factory
+}
+
 // NewProviderFromDetection creates a DNS provider based on auto-detection.
 // Returns nil provider with descriptive message for "unknown" providers.
+// Provider implementations must register themselves via RegisterProvider.
 func NewProviderFromDetection(ctx context.Context, domain string, cfg *config.DNSConfig) (DNSProvider, error) {
 	providerName, err := DetectProvider(ctx, domain)
 	if err != nil {
 		return nil, fmt.Errorf("failed to detect DNS provider: %w", err)
 	}
 
-	switch providerName {
-	case "cloudflare":
-		// Note: Cloudflare implementation will be added in Task 2
-		return nil, fmt.Errorf("cloudflare provider not yet implemented (will be added in Task 2)")
-
-	case "route53":
-		// Note: Route53 implementation will be added in Task 2
-		return nil, fmt.Errorf("route53 provider not yet implemented (will be added in Task 2)")
-
-	case "unknown":
+	if providerName == "unknown" {
 		// Return nil provider with descriptive message
 		// This is not an error - it means we should fall back to manual guide
 		return nil, fmt.Errorf("DNS provider could not be detected for domain %s. Please add DNS records manually using the generated guide", domain)
-
-	default:
-		return nil, fmt.Errorf("unexpected provider type: %s", providerName)
 	}
+
+	// Look up factory in registry
+	factory, ok := providerRegistry[providerName]
+	if !ok {
+		return nil, fmt.Errorf("provider %s detected but not registered (import the provider package to register it)", providerName)
+	}
+
+	return factory(ctx)
 }
