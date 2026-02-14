@@ -19,7 +19,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 5: Queue & Offline Handling** - Encrypted message queuing when home device is unreachable (completed 2026-02-14)
 - [x] **Phase 6: Webmail & Groupware** - Web-based email access with calendar and contacts sync (completed 2026-02-14)
 - [x] **Phase 7: Build System & Deployment** - GitHub Actions pipeline for user-customized multi-arch Docker images (completed 2026-02-14)
-- [ ] **Phase 8: Device Profiles & Client Setup** - Auto-generated device configuration for seamless mail client onboarding
+- [x] **Phase 8: Device Profiles & Client Setup** - Auto-generated device configuration for seamless mail client onboarding (completed 2026-02-14)
 - [ ] **Phase 9: Monitoring & Observability** - Mail health visibility, delivery tracking, and certificate lifecycle management
 
 ## Phase Details
@@ -150,9 +150,9 @@ Plans:
 **Plans:** 3 plans
 
 Plans:
-- [ ] 08-01-PLAN.md -- App password system and profile generation core (apppassword package, .mobileconfig via groob/plist, Thunderbird autoconfig XML, Outlook autodiscover XML)
-- [ ] 08-02-PLAN.md -- QR codes with single-use tokens, profile HTTP server, Caddy autodiscovery routes, DNS SRV record extension (RFC 6186)
-- [ ] 08-03-PLAN.md -- Docker integration, webmail "Add Device" web UI, CLI QR command, and phase integration test suite
+- [x] 08-01-PLAN.md -- App password system and profile generation core (apppassword package, .mobileconfig via micromdm/plist, Thunderbird autoconfig XML, Outlook autodiscover XML)
+- [x] 08-02-PLAN.md -- QR codes with single-use tokens, profile HTTP server, Caddy autodiscovery routes, DNS SRV record extension (RFC 6186)
+- [x] 08-03-PLAN.md -- Docker integration, webmail "Add Device" web UI, CLI QR command, and phase integration test suite
 
 ### Phase 9: Monitoring & Observability
 **Goal**: Users have clear visibility into whether their email system is healthy -- mail is flowing, queues are clear, certificates are valid, and the cloud relay container is running properly
@@ -186,7 +186,7 @@ Note: Phases 5 and 6 can execute in parallel after their dependencies are met. P
 | 5. Queue & Offline Handling | 2/2 | Complete | 2026-02-14 |
 | 6. Webmail & Groupware | 2/2 | Complete | 2026-02-14 |
 | 7. Build System & Deployment | 3/3 | Complete | 2026-02-14 |
-| 8. Device Profiles & Client Setup | 0/3 | Planned | - |
+| 8. Device Profiles & Client Setup | 3/3 | Complete | 2026-02-14 |
 | 9. Monitoring & Observability | 0/2 | Not started | - |
 
 ---

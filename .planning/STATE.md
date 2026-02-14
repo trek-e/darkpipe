@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-08)
 
 **Core value:** Your email lives on your hardware, encrypted in transit, never stored on someone else's server -- and it still works like normal email from the outside.
-**Current focus:** Phase 8 - Device Profiles & Client Setup (next up)
+**Current focus:** Phase 9 - Monitoring & Observability (next up)
 
 ## Current Position
 
-Phase: 8 of 9 (Device Profiles & Client Setup)
+Phase: 8 of 9 (Device Profiles & Client Setup) ✓ Complete
 Plan: 3 of 3 complete
-Status: Phase 8 COMPLETE — All device onboarding components delivered
-Last activity: 2026-02-14 -- Completed 08-03-PLAN.md (Webmail Integration)
+Status: Phase 8 complete — App passwords, profiles, QR codes, web UI, CLI, Docker deployed
+Last activity: 2026-02-14 -- Phase 8 complete (Device Profiles & Client Setup)
 
-Progress: [█████████░] 87%
+Progress: [█████████░] 89%
 
 ## Performance Metrics
 
@@ -175,6 +175,6 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-14
-Stopped at: Completed 08-03-PLAN.md (Webmail Integration) — Phase 8 COMPLETE
-Resume file: .planning/phases/08-device-profiles-client-setup/08-03-SUMMARY.md
-Next plan: Phase 09 - Monitoring & Health Checks
+Stopped at: Phase 8 complete (Device Profiles & Client Setup)
+Resume file: .planning/phases/08-device-profiles-client-setup/08-VERIFICATION.md
+Next plan: Phase 9: Monitoring & Observability (needs discuss → plan → execute)

@@ -75,11 +75,11 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Device Profiles & Client Setup
 
-- [ ] **PROF-01**: Auto-generated Apple .mobileconfig profiles for iOS/macOS
-- [ ] **PROF-02**: Auto-generated Android autoconfig profiles
-- [ ] **PROF-03**: QR code generation for quick device setup
-- [ ] **PROF-04**: Desktop mail client autodiscovery (Thunderbird autoconfig, Outlook autodiscover)
-- [ ] **PROF-05**: App-generated passwords — users never create or manage mail passwords directly
+- [x] **PROF-01**: Auto-generated Apple .mobileconfig profiles for iOS/macOS
+- [x] **PROF-02**: Auto-generated Android autoconfig profiles
+- [x] **PROF-03**: QR code generation for quick device setup
+- [x] **PROF-04**: Desktop mail client autodiscovery (Thunderbird autoconfig, Outlook autodiscover)
+- [x] **PROF-05**: App-generated passwords — users never create or manage mail passwords directly
 
 ### Monitoring
 
@@ -218,11 +218,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | BUILD-03 | Phase 7: Build System & Deployment | ✓ Complete |
 | UX-01 | Phase 7: Build System & Deployment | ✓ Complete |
 | UX-03 | Phase 7: Build System & Deployment | ✓ Complete |
-| PROF-01 | Phase 8: Device Profiles & Client Setup | Pending |
-| PROF-02 | Phase 8: Device Profiles & Client Setup | Pending |
-| PROF-03 | Phase 8: Device Profiles & Client Setup | Pending |
-| PROF-04 | Phase 8: Device Profiles & Client Setup | Pending |
-| PROF-05 | Phase 8: Device Profiles & Client Setup | Pending |
+| PROF-01 | Phase 8: Device Profiles & Client Setup | ✓ Complete |
+| PROF-02 | Phase 8: Device Profiles & Client Setup | ✓ Complete |
+| PROF-03 | Phase 8: Device Profiles & Client Setup | ✓ Complete |
+| PROF-04 | Phase 8: Device Profiles & Client Setup | ✓ Complete |
+| PROF-05 | Phase 8: Device Profiles & Client Setup | ✓ Complete |
 | MON-01 | Phase 9: Monitoring & Observability | Pending |
 | MON-02 | Phase 9: Monitoring & Observability | Pending |
 | MON-03 | Phase 9: Monitoring & Observability | Pending |
