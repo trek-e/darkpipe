@@ -1,0 +1,45 @@
+# DarkPipe Caddy Reverse Proxy
+# Forwards webmail and groupware traffic from public internet to home device over WireGuard tunnel
+
+# Webmail subdomain (e.g., mail.example.com, mail.example.org)
+{$WEBMAIL_DOMAINS} {
+	# Reverse proxy to home device webmail
+	reverse_proxy 10.0.0.2:8080 {
+		# Forward client headers
+		header_up Host {host}
+		header_up X-Real-IP {remote_host}
+		header_up X-Forwarded-For {remote_host}
+		header_up X-Forwarded-Proto {scheme}
+
+		# WebSocket support (for real-time updates)
+		header_up Connection {>Connection}
+		header_up Upgrade {>Upgrade}
+	}
+
+	# JSON access logging
+	log {
+		output file /var/log/caddy/access.log
+		format json
+	}
+
+	# Health check endpoint (optional monitoring)
+	handle /health {
+		respond "OK" 200
+	}
+}
+
+# CalDAV/CardDAV subdomain (e.g., dav.example.com)
+# TODO: Plan 06-02 will configure this
+# {$CALDAV_DOMAINS} {
+#     # Reverse proxy to home device CalDAV/CardDAV server
+#     reverse_proxy 10.0.0.2:8081 {
+#         header_up Host {host}
+#         header_up X-Real-IP {remote_host}
+#         header_up X-Forwarded-For {remote_host}
+#         header_up X-Forwarded-Proto {scheme}
+#     }
+#
+#     # Well-known URL redirects for auto-discovery
+#     redir /.well-known/caldav /dav/ permanent
+#     redir /.well-known/carddav /dav/ permanent
+# }
