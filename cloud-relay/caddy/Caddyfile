@@ -3,7 +3,27 @@
 
 # Webmail subdomain (e.g., mail.example.com, mail.example.org)
 {$WEBMAIL_DOMAINS} {
-	# Reverse proxy to home device webmail
+	# CalDAV/CardDAV auto-discovery (RFC 6764)
+	redir /.well-known/caldav /radicale/ 301
+	redir /.well-known/carddav /radicale/ 301
+
+	# For Stalwart (built-in CalDAV/CardDAV), use these instead:
+	# redir /.well-known/caldav / 301
+	# redir /.well-known/carddav / 301
+	# (and remove the handle_path /radicale/* block)
+
+	# CalDAV/CardDAV reverse proxy to home device Radicale
+	# Note: Remove this block when using Stalwart (built-in CalDAV/CardDAV on port 8080)
+	handle_path /radicale/* {
+		reverse_proxy 10.0.0.2:5232 {
+			header_up Host {host}
+			header_up X-Real-IP {remote_host}
+			header_up X-Forwarded-For {remote_host}
+			header_up X-Forwarded-Proto {scheme}
+		}
+	}
+
+	# Webmail reverse proxy (default route)
 	reverse_proxy 10.0.0.2:8080 {
 		# Forward client headers
 		header_up Host {host}
@@ -27,19 +47,3 @@
 		respond "OK" 200
 	}
 }
-
-# CalDAV/CardDAV subdomain (e.g., dav.example.com)
-# TODO: Plan 06-02 will configure this
-# {$CALDAV_DOMAINS} {
-#     # Reverse proxy to home device CalDAV/CardDAV server
-#     reverse_proxy 10.0.0.2:8081 {
-#         header_up Host {host}
-#         header_up X-Real-IP {remote_host}
-#         header_up X-Forwarded-For {remote_host}
-#         header_up X-Forwarded-Proto {scheme}
-#     }
-#
-#     # Well-known URL redirects for auto-discovery
-#     redir /.well-known/caldav /dav/ permanent
-#     redir /.well-known/carddav /dav/ permanent
-# }
