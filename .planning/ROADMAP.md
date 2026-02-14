@@ -164,11 +164,12 @@ Plans:
   3. Cloud relay container exposes health check endpoints that return pass/fail status
   4. Certificate rotation is configurable (30/60/90 day intervals) and rotations happen automatically without service interruption
   5. User receives an alert at least 14 days before any certificate expires, and again at 7 days if not renewed
-**Plans**: TBD
+**Plans:** 3 plans
 
 Plans:
-- [ ] 09-01: Mail queue and delivery status monitoring
-- [ ] 09-02: Container health checks and certificate lifecycle management
+- [ ] 09-01-PLAN.md -- Health check framework, Postfix queue monitor, and delivery status tracker
+- [ ] 09-02-PLAN.md -- Alert notification system with rate limiting, certificate lifecycle management, and DKIM rotation
+- [ ] 09-03-PLAN.md -- Status aggregator, CLI command, web dashboard, Docker health checks, push monitoring, and phase test suite
 
 ## Progress
 
@@ -187,7 +188,7 @@ Note: Phases 5 and 6 can execute in parallel after their dependencies are met. P
 | 6. Webmail & Groupware | 2/2 | Complete | 2026-02-14 |
 | 7. Build System & Deployment | 3/3 | Complete | 2026-02-14 |
 | 8. Device Profiles & Client Setup | 3/3 | Complete | 2026-02-14 |
-| 9. Monitoring & Observability | 0/2 | Not started | - |
+| 9. Monitoring & Observability | 0/3 | Not started | - |
 
 ---
 *Roadmap created: 2026-02-08*
