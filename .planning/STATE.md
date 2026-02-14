@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-08)
 
 **Core value:** Your email lives on your hardware, encrypted in transit, never stored on someone else's server -- and it still works like normal email from the outside.
-**Current focus:** Phase 4 complete, next: Phase 5 - Queue & Offline Handling
+**Current focus:** Phase 5 - Queue & Offline Handling (in progress)
 
 ## Current Position
 
-Phase: 4 of 9 (DNS & Email Authentication)
-Plan: 3 of 3 in current phase (Complete)
-Status: Phase Complete - Verified (24/24 must-haves)
-Last activity: 2026-02-14 -- Phase 04 verified complete (24/24 must-haves passed)
+Phase: 5 of 9 (Queue & Offline Handling)
+Plan: 1 of 2 in current phase (Complete)
+Status: In Progress
+Last activity: 2026-02-14 -- Completed 05-01 (encrypted message queue with age encryption)
 
-Progress: [████████░░] 44%
+Progress: [████████░░] 48%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 12
-- Average duration: 6.0 minutes
-- Total execution time: 1.21 hours
+- Total plans completed: 13
+- Average duration: 6.3 minutes
+- Total execution time: 1.36 hours
 
 **By Phase:**
 
@@ -31,10 +31,11 @@ Progress: [████████░░] 44%
 | 02 (Cloud Relay) | 3 | 1142s | 381s |
 | 03 (Home Mail Server) | 3 | 881s | 294s |
 | 04 (DNS & Email Auth) | 3 | 1488s | 496s |
+| 05 (Queue & Offline) | 1 | 567s | 567s |
 
 **Recent Trend:**
-- Last 5 plans: 275s, 347s, 559s, 582s
-- Trend: Phase 04 complete (~9.7 min average), validation + CLI complete
+- Last 5 plans: 347s, 559s, 582s, 567s (05-01)
+- Trend: Phase 05 started - encrypted queue with age (9m 27s)
 
 *Updated after each plan completion*
 
@@ -108,6 +109,12 @@ Recent decisions affecting current work:
 - [04-03]: Parse Authentication-Results with emersion/go-msgauth/authres (RFC 8601 compliant)
 - [04-03]: CLI uses flag package with environment variable overrides (12-factor pattern)
 - [04-03]: Default DNS servers: 8.8.8.8:53 and 1.1.1.1:53 (public, reliable, fast)
+- [05-01]: filippo.io/age for message encryption (industry-standard, simple API)
+- [05-01]: CRC32 checksum before decrypt for fast rejection of corrupted data
+- [05-01]: Message-ID deduplication to prevent duplicate queuing
+- [05-01]: Queue enabled by default (RELAY_QUEUE_ENABLED=true)
+- [05-01]: 200MB RAM limit default (leaves headroom in 256MB container)
+- [05-01]: Rate limit to 10 messages/tick to prevent thundering herd on reconnection
 
 ### Pending Todos
 
@@ -122,6 +129,6 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-14
-Stopped at: Phase 04 complete -- all 3 plans executed, verification passed (24/24), docs updated
-Resume file: .planning/phases/04-dns-email-auth/04-VERIFICATION.md
-Next plan: /gsd:plan-phase 5 (Queue & Offline Handling)
+Stopped at: Completed 05-01-PLAN.md (encrypted queue with age encryption, QueuedForwarder, background processor)
+Resume file: .planning/phases/05-queue-offline-handling/05-01-SUMMARY.md
+Next plan: 05-02-PLAN.md (S3 overflow storage for full queue)
