@@ -35,6 +35,18 @@ services:
       # Ephemeral storage verification (default: 60 seconds)
       RELAY_EPHEMERAL_CHECK_INTERVAL: 60
 
+      # Queue configuration (QUEUE-01, QUEUE-03)
+      # RELAY_QUEUE_ENABLED: true
+      # RELAY_QUEUE_KEY_PATH: /data/queue-keys/identity
+      # RELAY_QUEUE_SNAPSHOT_PATH: /data/queue-state/snapshot.json
+
+      # S3 overflow (QUEUE-02, optional - uncomment and configure)
+      # RELAY_OVERFLOW_ENABLED: false
+      # RELAY_OVERFLOW_ENDPOINT: gateway.storjshare.io
+      # RELAY_OVERFLOW_BUCKET: darkpipe-queue
+      # RELAY_OVERFLOW_ACCESS_KEY:
+      # RELAY_OVERFLOW_SECRET_KEY:
+
     # Resource limits per UX-02: Must run with less than 256MB RAM on $5/month VPS
     deploy:
       resources:
@@ -49,6 +61,9 @@ services:
 
       # TLS certificates (placeholder for Plan 02-02)
       - certbot-etc:/etc/letsencrypt:ro
+
+      # Queue data (age identity keys, snapshots)
+      - queue-data:/data
 
       # mTLS certificates (if using mTLS transport)
       # - ./certs:/certs:ro
@@ -72,3 +87,4 @@ volumes:
   postfix-queue:
   certbot-etc:
   certbot-var:
+  queue-data:

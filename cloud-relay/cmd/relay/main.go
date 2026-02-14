@@ -100,6 +100,23 @@ func main() {
 			log.Fatalf("Failed to initialize message queue: %v", err)
 		}
 
+		// Initialize S3 overflow storage if enabled
+		if cfg.OverflowEnabled {
+			log.Printf("Initializing S3 overflow storage: endpoint=%s bucket=%s", cfg.OverflowEndpoint, cfg.OverflowBucket)
+			overflow, err := queue.NewOverflowStorage(
+				cfg.OverflowEndpoint,
+				cfg.OverflowAccessKey,
+				cfg.OverflowSecretKey,
+				cfg.OverflowBucket,
+				cfg.OverflowUseSSL,
+			)
+			if err != nil {
+				log.Fatalf("Failed to initialize overflow storage: %v", err)
+			}
+			msgQueue.SetOverflow(overflow)
+			log.Println("S3 overflow storage enabled")
+		}
+
 		queuedFwd := forward.NewQueuedForwarder(transportForwarder, msgQueue, true)
 		activeForwarder = queuedFwd
 

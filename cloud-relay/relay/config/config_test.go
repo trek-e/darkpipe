@@ -306,3 +306,74 @@ func TestLoadFromEnv_QueueDisabled(t *testing.T) {
 		t.Errorf("QueueEnabled = true, want false")
 	}
 }
+
+func TestLoadFromEnv_OverflowDefaults(t *testing.T) {
+	t.Setenv("RELAY_HOME_ADDR", "10.8.0.2:25")
+
+	cfg, err := LoadFromEnv()
+	if err != nil {
+		t.Fatalf("LoadFromEnv: %v", err)
+	}
+
+	// Verify overflow defaults (disabled by default)
+	if cfg.OverflowEnabled {
+		t.Errorf("OverflowEnabled = true, want default false")
+	}
+	if cfg.OverflowBucket != "darkpipe-queue" {
+		t.Errorf("OverflowBucket = %q, want default %q", cfg.OverflowBucket, "darkpipe-queue")
+	}
+	if !cfg.OverflowUseSSL {
+		t.Errorf("OverflowUseSSL = false, want default true")
+	}
+}
+
+func TestLoadFromEnv_OverflowEnabled_MissingFields(t *testing.T) {
+	t.Setenv("RELAY_HOME_ADDR", "10.8.0.2:25")
+	t.Setenv("RELAY_OVERFLOW_ENABLED", "true")
+	// Missing endpoint, access key, secret key
+
+	_, err := LoadFromEnv()
+	if err == nil {
+		t.Fatalf("LoadFromEnv: expected error for overflow enabled without required fields, got nil")
+	}
+
+	expectedMsg := "RELAY_OVERFLOW_ENDPOINT is required when overflow is enabled"
+	if errMsg := err.Error(); errMsg != expectedMsg {
+		t.Errorf("error message = %q, want %q", errMsg, expectedMsg)
+	}
+}
+
+func TestLoadFromEnv_OverflowEnabled_AllFields(t *testing.T) {
+	t.Setenv("RELAY_HOME_ADDR", "10.8.0.2:25")
+	t.Setenv("RELAY_OVERFLOW_ENABLED", "true")
+	t.Setenv("RELAY_OVERFLOW_ENDPOINT", "gateway.storjshare.io")
+	t.Setenv("RELAY_OVERFLOW_BUCKET", "test-bucket")
+	t.Setenv("RELAY_OVERFLOW_ACCESS_KEY", "test-access-key")
+	t.Setenv("RELAY_OVERFLOW_SECRET_KEY", "test-secret-key")
+	t.Setenv("RELAY_OVERFLOW_USE_SSL", "true")
+
+	cfg, err := LoadFromEnv()
+	if err != nil {
+		t.Fatalf("LoadFromEnv: %v", err)
+	}
+
+	// Verify overflow configuration
+	if !cfg.OverflowEnabled {
+		t.Errorf("OverflowEnabled = false, want true")
+	}
+	if cfg.OverflowEndpoint != "gateway.storjshare.io" {
+		t.Errorf("OverflowEndpoint = %q, want %q", cfg.OverflowEndpoint, "gateway.storjshare.io")
+	}
+	if cfg.OverflowBucket != "test-bucket" {
+		t.Errorf("OverflowBucket = %q, want %q", cfg.OverflowBucket, "test-bucket")
+	}
+	if cfg.OverflowAccessKey != "test-access-key" {
+		t.Errorf("OverflowAccessKey = %q, want %q", cfg.OverflowAccessKey, "test-access-key")
+	}
+	if cfg.OverflowSecretKey != "test-secret-key" {
+		t.Errorf("OverflowSecretKey = %q, want %q", cfg.OverflowSecretKey, "test-secret-key")
+	}
+	if !cfg.OverflowUseSSL {
+		t.Errorf("OverflowUseSSL = false, want true")
+	}
+}

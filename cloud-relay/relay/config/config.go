@@ -35,6 +35,14 @@ type Config struct {
 	QueueMaxMessages  int    // Max messages in queue (default 10000)
 	QueueTTLHours     int    // Max age before purge (default 168 = 7 days)
 	QueueSnapshotPath string // Path for queue metadata snapshots
+
+	// S3 overflow configuration (QUEUE-02, optional)
+	OverflowEnabled   bool
+	OverflowEndpoint  string // e.g., "gateway.storjshare.io" or "s3.amazonaws.com"
+	OverflowBucket    string
+	OverflowAccessKey string
+	OverflowSecretKey string
+	OverflowUseSSL    bool // default true
 }
 
 // LoadFromEnv loads configuration from environment variables with sensible defaults.
@@ -51,12 +59,18 @@ func LoadFromEnv() (*Config, error) {
 		WriteTimeout:      30 * time.Second,
 		StrictModeEnabled: getEnvBool("RELAY_STRICT_MODE", false),
 		WebhookURL:        getEnv("RELAY_WEBHOOK_URL", ""),
-		QueueEnabled:      getEnvBool("RELAY_QUEUE_ENABLED", true),                             // Enabled by default
+		QueueEnabled:      getEnvBool("RELAY_QUEUE_ENABLED", true),                                 // Enabled by default
 		QueueKeyPath:      getEnv("RELAY_QUEUE_KEY_PATH", "/data/queue-keys/identity"),         // Default path
 		QueueMaxRAMBytes:  getEnvInt64("RELAY_QUEUE_MAX_RAM", 200*1024*1024),                   // 200MB
 		QueueMaxMessages:  int(getEnvInt64("RELAY_QUEUE_MAX_MESSAGES", 10000)),                 // 10k messages
 		QueueTTLHours:     int(getEnvInt64("RELAY_QUEUE_TTL_HOURS", 168)),                      // 7 days
 		QueueSnapshotPath: getEnv("RELAY_QUEUE_SNAPSHOT_PATH", "/data/queue-state/snapshot.json"), // Default path
+		OverflowEnabled:   getEnvBool("RELAY_OVERFLOW_ENABLED", false),                         // Disabled by default (requires S3 credentials)
+		OverflowEndpoint:  getEnv("RELAY_OVERFLOW_ENDPOINT", ""),
+		OverflowBucket:    getEnv("RELAY_OVERFLOW_BUCKET", "darkpipe-queue"),
+		OverflowAccessKey: getEnv("RELAY_OVERFLOW_ACCESS_KEY", ""),
+		OverflowSecretKey: getEnv("RELAY_OVERFLOW_SECRET_KEY", ""),
+		OverflowUseSSL:    getEnvBool("RELAY_OVERFLOW_USE_SSL", true),
 	}
 
 	// Validate based on transport type
@@ -72,6 +86,19 @@ func LoadFromEnv() (*Config, error) {
 
 	if cfg.HomeDeviceAddr == "" {
 		return nil, fmt.Errorf("RELAY_HOME_ADDR is required")
+	}
+
+	// Validate overflow configuration if enabled
+	if cfg.OverflowEnabled {
+		if cfg.OverflowEndpoint == "" {
+			return nil, fmt.Errorf("RELAY_OVERFLOW_ENDPOINT is required when overflow is enabled")
+		}
+		if cfg.OverflowAccessKey == "" {
+			return nil, fmt.Errorf("RELAY_OVERFLOW_ACCESS_KEY is required when overflow is enabled")
+		}
+		if cfg.OverflowSecretKey == "" {
+			return nil, fmt.Errorf("RELAY_OVERFLOW_SECRET_KEY is required when overflow is enabled")
+		}
 	}
 
 	return cfg, nil

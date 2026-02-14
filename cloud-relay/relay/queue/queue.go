@@ -58,6 +58,7 @@ type MessageQueue struct {
 	snapshotPath    string
 	maxMessages     int
 	ttlHours        int
+	overflow        *OverflowStorage // S3-compatible overflow storage (nil if disabled)
 }
 
 // NewMessageQueue creates a new encrypted message queue.
@@ -97,6 +98,14 @@ func NewMessageQueue(cfg QueueConfig) (*MessageQueue, error) {
 	}
 
 	return q, nil
+}
+
+// SetOverflow injects overflow storage into the queue.
+// Must be called before Enqueue if overflow is needed.
+func (q *MessageQueue) SetOverflow(overflow *OverflowStorage) {
+	q.mu.Lock()
+	defer q.mu.Unlock()
+	q.overflow = overflow
 }
 
 // Enqueue adds a message to the queue with encryption.
@@ -140,7 +149,16 @@ func (q *MessageQueue) Enqueue(ctx context.Context, from string, to []string, da
 
 	// Check RAM limit
 	if q.currentRAMBytes+msgSize > q.maxRAMBytes {
-		return ErrQueueFull
+		// RAM limit exceeded - try overflow if available
+		if q.overflow == nil {
+			return ErrQueueFull
+		}
+
+		// Spill oldest messages to S3 to free up RAM
+		needed := (q.currentRAMBytes + msgSize) - q.maxRAMBytes
+		if err := q.overflowOldestMessages(ctx, needed); err != nil {
+			return fmt.Errorf("overflow messages: %w", err)
+		}
 	}
 
 	// Add to queue
@@ -164,6 +182,7 @@ func (q *MessageQueue) Enqueue(ctx context.Context, from string, to []string, da
 }
 
 // Dequeue removes a message from the queue, decrypts it, and returns the plaintext.
+// If the message is in overflow storage, it retrieves it from S3 first.
 func (q *MessageQueue) Dequeue(id string) (*QueuedMessage, []byte, error) {
 	q.mu.Lock()
 	defer q.mu.Unlock()
@@ -173,15 +192,34 @@ func (q *MessageQueue) Dequeue(id string) (*QueuedMessage, []byte, error) {
 		return nil, nil, ErrNotFound
 	}
 
+	// Retrieve encrypted data (from RAM or S3)
+	var encryptedData []byte
+	if msg.InOverflow {
+		// Download from S3 overflow
+		if q.overflow == nil {
+			return nil, nil, fmt.Errorf("message in overflow but overflow storage not available")
+		}
+
+		var err error
+		encryptedData, err = q.overflow.Download(context.Background(), msg.OverflowKey)
+		if err != nil {
+			return nil, nil, fmt.Errorf("download from overflow: %w", err)
+		}
+	} else {
+		encryptedData = msg.EncryptedData
+	}
+
 	// Decrypt message
-	plaintext, err := Decrypt(msg.EncryptedData, msg.Checksum, q.identity)
+	plaintext, err := Decrypt(encryptedData, msg.Checksum, q.identity)
 	if err != nil {
 		return nil, nil, fmt.Errorf("decrypt message: %w", err)
 	}
 
 	// Remove from queue
 	delete(q.messages, id)
-	q.currentRAMBytes -= msg.Size
+	if !msg.InOverflow {
+		q.currentRAMBytes -= msg.Size
+	}
 
 	// Remove from order slice
 	for i, oid := range q.order {
@@ -418,4 +456,46 @@ func trimSpace(s string) string {
 	}
 
 	return s[start:end]
+}
+
+// overflowOldestMessages spills oldest messages to S3 overflow storage
+// until at least 'needed' bytes of RAM are freed.
+// Messages already in overflow are skipped.
+func (q *MessageQueue) overflowOldestMessages(ctx context.Context, needed int64) error {
+	if q.overflow == nil {
+		return fmt.Errorf("overflow storage not configured")
+	}
+
+	freed := int64(0)
+
+	// Iterate oldest messages first (FIFO order)
+	for _, id := range q.order {
+		if freed >= needed {
+			break // Enough space freed
+		}
+
+		msg := q.messages[id]
+
+		// Skip if already in overflow
+		if msg.InOverflow {
+			continue
+		}
+
+		// Upload encrypted data to S3
+		key, err := q.overflow.Upload(ctx, msg.ID, msg.EncryptedData)
+		if err != nil {
+			return fmt.Errorf("upload message %s to overflow: %w", msg.ID, err)
+		}
+
+		// Mark as in overflow and free RAM
+		msg.InOverflow = true
+		msg.OverflowKey = key
+		freed += msg.Size
+		q.currentRAMBytes -= msg.Size
+
+		// Nil out encrypted data to release memory
+		msg.EncryptedData = nil
+	}
+
+	return nil
 }

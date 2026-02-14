@@ -89,6 +89,17 @@ func (q *MessageQueue) processQueue(ctx context.Context, transport Forwarder) {
 
 // processSingle decrypts and delivers a single queued message.
 func (q *MessageQueue) processSingle(ctx context.Context, transport Forwarder, id string) error {
+	// Check if message is in overflow (need to delete from S3 after delivery)
+	q.mu.RLock()
+	msg, exists := q.messages[id]
+	var inOverflow bool
+	var overflowKey string
+	if exists {
+		inOverflow = msg.InOverflow
+		overflowKey = msg.OverflowKey
+	}
+	q.mu.RUnlock()
+
 	// Dequeue and decrypt
 	msg, plaintext, err := q.Dequeue(id)
 	if err != nil {
@@ -116,6 +127,19 @@ func (q *MessageQueue) processSingle(ctx context.Context, transport Forwarder, i
 			log.Printf("ERROR: Failed to re-enqueue message %s: %v", id, enqErr)
 		}
 		return err
+	}
+
+	// Delivery succeeded - clean up overflow storage if needed
+	if inOverflow && overflowKey != "" {
+		q.mu.RLock()
+		overflow := q.overflow
+		q.mu.RUnlock()
+
+		if overflow != nil {
+			if err := overflow.Delete(ctx, overflowKey); err != nil {
+				log.Printf("WARNING: Failed to delete overflow message %s from S3: %v", overflowKey, err)
+			}
+		}
 	}
 
 	return nil
