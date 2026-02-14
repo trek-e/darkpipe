@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-08)
 ## Current Position
 
 Phase: 4 of 9 (DNS & Email Authentication)
-Plan: 0 of 3 in current phase (Not Started)
-Status: Ready to Plan
-Last activity: 2026-02-09 -- Phase 03 verified complete (18/18 must-haves passed)
+Plan: 1 of 3 in current phase (In Progress)
+Status: Executing
+Last activity: 2026-02-14 -- Completed 04-01-PLAN.md (DKIM keys and DNS records)
 
-Progress: [███████░░░] 33%
+Progress: [████████░░] 37%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 9
-- Average duration: 5.5 minutes
-- Total execution time: 0.82 hours
+- Total plans completed: 10
+- Average duration: 5.6 minutes
+- Total execution time: 0.92 hours
 
 **By Phase:**
 
@@ -30,10 +30,11 @@ Progress: [███████░░░] 33%
 | 01 (Transport Layer) | 3 | 889s | 296s |
 | 02 (Cloud Relay) | 3 | 1142s | 381s |
 | 03 (Home Mail Server) | 3 | 881s | 294s |
+| 04 (DNS & Email Auth) | 1 | 347s | 347s |
 
 **Recent Trend:**
-- Last 5 plans: 542s, 300s, 306s, 275s
-- Trend: Spam filtering plan faster (~4.5 min), Phase 03 complete
+- Last 5 plans: 300s, 306s, 275s, 347s
+- Trend: Phase 04 started, DKIM and DNS records complete (~5.8 min)
 
 *Updated after each plan completion*
 
@@ -89,6 +90,12 @@ Recent decisions affecting current work:
 - [Phase 03-03]: Private network whitelist (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16) prevents greylisting cloud relay traffic
 - [Phase 03-03]: Authenticated submission (port 587) bypasses Rspamd for all mail servers
 - [Phase 03-03]: Phase test suite (test-mail-flow.sh + test-spam-filter.sh) validates all Phase 03 success criteria
+- [04-01]: Time-based DKIM selector format ({prefix}-{YYYY}q{Q}) for quarterly rotation
+- [04-01]: Explicit ip4: mechanism in SPF (not include:) to minimize DNS lookup count
+- [04-01]: DMARC sp= tag with default sp=quarantine for subdomain protection
+- [04-01]: DMARC p=none default for monitoring-first approach (progression: none -> quarantine -> reject)
+- [04-01]: Single-line DKIM TXT records for DNS compatibility
+- [04-01]: 0600 permissions for DKIM private keys (matches Phase 1 secrets pattern)
 
 ### Pending Todos
 
@@ -102,7 +109,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-09
-Stopped at: Phase 03 complete -- all 3 plans executed, verification passed (18/18), docs updated
-Resume file: .planning/phases/03-home-mail-server/03-VERIFICATION.md
-Next plan: /gsd:plan-phase 4 (DNS & Email Authentication)
+Last session: 2026-02-14
+Stopped at: Completed 04-01-PLAN.md (DKIM keys and DNS records)
+Resume file: .planning/phases/04-dns-email-auth/04-01-SUMMARY.md
+Next plan: 04-02-PLAN.md (DNS provider API integration)
