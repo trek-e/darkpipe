@@ -147,12 +147,12 @@ Plans:
   3. User scans a QR code on their phone and the mail account is configured without typing any server details
   4. Thunderbird and Outlook auto-discover server settings when the user enters only their email address and password
   5. Users authenticate with app-generated passwords and never create or manage mail passwords directly
-**Plans**: TBD
+**Plans:** 3 plans
 
 Plans:
-- [ ] 08-01: Apple .mobileconfig and Android autoconfig generation
-- [ ] 08-02: QR code generation and desktop autodiscovery (Thunderbird, Outlook)
-- [ ] 08-03: App-generated password system
+- [ ] 08-01-PLAN.md -- App password system and profile generation core (apppassword package, .mobileconfig via groob/plist, Thunderbird autoconfig XML, Outlook autodiscover XML)
+- [ ] 08-02-PLAN.md -- QR codes with single-use tokens, profile HTTP server, Caddy autodiscovery routes, DNS SRV record extension (RFC 6186)
+- [ ] 08-03-PLAN.md -- Docker integration, webmail "Add Device" web UI, CLI QR command, and phase integration test suite
 
 ### Phase 9: Monitoring & Observability
 **Goal**: Users have clear visibility into whether their email system is healthy -- mail is flowing, queues are clear, certificates are valid, and the cloud relay container is running properly
@@ -186,7 +186,7 @@ Note: Phases 5 and 6 can execute in parallel after their dependencies are met. P
 | 5. Queue & Offline Handling | 2/2 | Complete | 2026-02-14 |
 | 6. Webmail & Groupware | 2/2 | Complete | 2026-02-14 |
 | 7. Build System & Deployment | 3/3 | Complete | 2026-02-14 |
-| 8. Device Profiles & Client Setup | 0/3 | Not started | - |
+| 8. Device Profiles & Client Setup | 0/3 | Planned | - |
 | 9. Monitoring & Observability | 0/2 | Not started | - |
 
 ---
