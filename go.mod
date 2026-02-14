@@ -9,6 +9,7 @@ require (
 )
 
 require (
+	github.com/emersion/go-msgauth v0.7.0 // indirect
 	github.com/emersion/go-sasl v0.0.0-20241020182733-b788ff22d5a6 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/josharian/native v1.1.0 // indirect
