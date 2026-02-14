@@ -99,11 +99,11 @@ Plans:
   1. With queuing enabled and home device offline, inbound mail queues encrypted on the cloud relay and delivers automatically when the home device reconnects
   2. When the cloud relay queue exceeds its threshold, overflow messages store encrypted in Storj/S3-compatible storage and deliver when home device is available
   3. With queuing disabled, the cloud relay returns a 4xx temporary failure to sending servers when the home device is unreachable, causing the sender's server to retry later (or bounce after its own timeout)
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 05-01: Encrypted RAM queue with configurable behavior
-- [ ] 05-02: S3-compatible overflow storage integration
+- [ ] 05-01-PLAN.md -- Encrypted RAM queue with age encryption, QueuedForwarder wrapper, background processor, configurable queue-or-bounce behavior
+- [ ] 05-02-PLAN.md -- S3-compatible overflow storage via minio-go (Storj/AWS S3/MinIO), queue integration, and phase integration test suite
 
 ### Phase 6: Webmail & Groupware
 **Goal**: Non-technical household members access email through a web browser and sync calendars/contacts with their phones and computers
