@@ -34,13 +34,13 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Email Authentication & Deliverability
 
-- [ ] **AUTH-01**: Automated SPF record generation
-- [ ] **AUTH-02**: Automated DKIM key generation and signing (2048-bit minimum)
-- [ ] **AUTH-03**: Automated DMARC policy generation
-- [ ] **AUTH-04**: DNS validation checker (verify SPF/DKIM/DMARC/MX/PTR setup)
-- [ ] **AUTH-05**: DNS API integration for supported providers (Cloudflare, Route53, etc.)
-- [ ] **AUTH-06**: Manual DNS setup guide with copy-paste templates for unsupported providers
-- [ ] **AUTH-07**: Reverse DNS (PTR) verification and setup documentation
+- [x] **AUTH-01**: Automated SPF record generation
+- [x] **AUTH-02**: Automated DKIM key generation and signing (2048-bit minimum)
+- [x] **AUTH-03**: Automated DMARC policy generation
+- [x] **AUTH-04**: DNS validation checker (verify SPF/DKIM/DMARC/MX/PTR setup)
+- [x] **AUTH-05**: DNS API integration for supported providers (Cloudflare, Route53, etc.)
+- [x] **AUTH-06**: Manual DNS setup guide with copy-paste templates for unsupported providers
+- [x] **AUTH-07**: Reverse DNS (PTR) verification and setup documentation
 
 ### Home Mail Server
 
@@ -199,13 +199,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MAIL-04 | Phase 3: Home Mail Server | ✓ Complete |
 | MAIL-05 | Phase 3: Home Mail Server | ✓ Complete |
 | MAIL-06 | Phase 3: Home Mail Server | ✓ Complete |
-| AUTH-01 | Phase 4: DNS & Email Authentication | Pending |
-| AUTH-02 | Phase 4: DNS & Email Authentication | Pending |
-| AUTH-03 | Phase 4: DNS & Email Authentication | Pending |
-| AUTH-04 | Phase 4: DNS & Email Authentication | Pending |
-| AUTH-05 | Phase 4: DNS & Email Authentication | Pending |
-| AUTH-06 | Phase 4: DNS & Email Authentication | Pending |
-| AUTH-07 | Phase 4: DNS & Email Authentication | Pending |
+| AUTH-01 | Phase 4: DNS & Email Authentication | ✓ Complete |
+| AUTH-02 | Phase 4: DNS & Email Authentication | ✓ Complete |
+| AUTH-03 | Phase 4: DNS & Email Authentication | ✓ Complete |
+| AUTH-04 | Phase 4: DNS & Email Authentication | ✓ Complete |
+| AUTH-05 | Phase 4: DNS & Email Authentication | ✓ Complete |
+| AUTH-06 | Phase 4: DNS & Email Authentication | ✓ Complete |
+| AUTH-07 | Phase 4: DNS & Email Authentication | ✓ Complete |
 | QUEUE-01 | Phase 5: Queue & Offline Handling | Pending |
 | QUEUE-02 | Phase 5: Queue & Offline Handling | Pending |
 | QUEUE-03 | Phase 5: Queue & Offline Handling | Pending |

@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Transport Layer** - Encrypted tunnel between cloud relay and home device with NAT traversal (completed 2026-02-09)
 - [x] **Phase 2: Cloud Relay** - Minimal internet-facing SMTP gateway that receives and forwards mail (completed 2026-02-09)
 - [x] **Phase 3: Home Mail Server** - Full-featured mail server with IMAP access on user-owned hardware (completed 2026-02-09)
-- [ ] **Phase 4: DNS & Email Authentication** - Automated SPF/DKIM/DMARC setup and DNS provider integration
+- [x] **Phase 4: DNS & Email Authentication** - Automated SPF/DKIM/DMARC setup and DNS provider integration (completed 2026-02-14)
 - [ ] **Phase 5: Queue & Offline Handling** - Encrypted message queuing when home device is unreachable
 - [ ] **Phase 6: Webmail & Groupware** - Web-based email access with calendar and contacts sync
 - [ ] **Phase 7: Build System & Deployment** - GitHub Actions pipeline for user-customized multi-arch Docker images
@@ -87,9 +87,9 @@ Plans:
 **Plans:** 3 plans
 
 Plans:
-- [ ] 04-01-PLAN.md -- DKIM key generation (2048-bit RSA), SPF/DKIM/DMARC/MX record generation, DKIM signing via emersion/go-msgauth, DNS-RECORDS.md manual guide output
-- [ ] 04-02-PLAN.md -- DNSProvider interface, Cloudflare (cloudflare-go v6) and Route53 (aws-sdk-go-v2) API integration, NS-based auto-detection, dry-run safety, propagation polling
-- [ ] 04-03-PLAN.md -- DNS validation checker (miekg/dns), PTR verification, Authentication-Results parser, unified `darkpipe dns-setup` CLI with --validate-only, --json, --rotate-dkim modes
+- [x] 04-01-PLAN.md -- DKIM key generation (2048-bit RSA), SPF/DKIM/DMARC/MX record generation, DKIM signing via emersion/go-msgauth, DNS-RECORDS.md manual guide output
+- [x] 04-02-PLAN.md -- DNSProvider interface, Cloudflare (cloudflare-go v6) and Route53 (aws-sdk-go-v2) API integration, NS-based auto-detection, dry-run safety, propagation polling
+- [x] 04-03-PLAN.md -- DNS validation checker (miekg/dns), PTR verification, Authentication-Results parser, unified `darkpipe dns-setup` CLI with --validate-only, --json, --rotate-dkim modes
 
 ### Phase 5: Queue & Offline Handling
 **Goal**: Users choose how mail is handled when their home device is offline -- queue it encrypted on the cloud relay, overflow to S3-compatible storage, or bounce it immediately
@@ -182,7 +182,7 @@ Note: Phases 5 and 6 can execute in parallel after their dependencies are met. P
 | 1. Transport Layer | 3/3 | Complete | 2026-02-09 |
 | 2. Cloud Relay | 3/3 | Complete | 2026-02-09 |
 | 3. Home Mail Server | 3/3 | Complete | 2026-02-09 |
-| 4. DNS & Email Authentication | 0/3 | Planning complete | - |
+| 4. DNS & Email Authentication | 3/3 | Complete | 2026-02-14 |
 | 5. Queue & Offline Handling | 0/2 | Not started | - |
 | 6. Webmail & Groupware | 0/2 | Not started | - |
 | 7. Build System & Deployment | 0/3 | Not started | - |
