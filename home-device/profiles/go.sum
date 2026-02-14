@@ -1,4 +1,6 @@
 github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
 github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
+github.com/micromdm/plist v0.2.2 h1:a5Yt/coion6hwVEW0da8a5P8IyAchXZ6eC+oBA0uJW8=
+github.com/micromdm/plist v0.2.2/go.mod h1:flkfm0od6GzyXBqI28h5sgEyi3iPO28W2t1Zm9LpwWs=
 golang.org/x/crypto v0.32.0 h1:euUpcYgM8WcP71gNpTqQCn6rC2t6ULUPiOzfWaXVVfc=
 golang.org/x/crypto v0.32.0/go.mod h1:ZnnJkOaASj8g0AjIduWNlq2NRxL0PlBrbKVyZ6V/Ugc=
