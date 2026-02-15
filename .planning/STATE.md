@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-08)
 ## Current Position
 
 Phase: 10 of 10 (Mail Migration)
-Plan: 1 of TBD (core engine complete)
-Status: Completed 10-01 IMAP migration core engine
-Last activity: 2026-02-14 -- Completed Phase 10 Plan 01
+Plan: 3 of 4 (Provider integrations complete)
+Status: Completed 10-03 Provider integrations with OAuth2 and API clients
+Last activity: 2026-02-15 -- Completed Phase 10 Plan 03
 
-Progress: [█████████░] 90%
+Progress: [█████████░] 92%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 27
-- Average duration: 5.7 minutes
-- Total execution time: 2.6 hours
+- Total plans completed: 29
+- Average duration: 6.0 minutes
+- Total execution time: 2.9 hours
 
 **By Phase:**
 
@@ -36,18 +36,19 @@ Progress: [█████████░] 90%
 | 07 (Build System & Deployment) | 3 | 1245s | 415s |
 | 08 (Device Profiles & Client Setup) | 3 | 1274s | 425s |
 | 09 (Monitoring & Observability) | 3 | 1294s | 431s |
-| 10 (Mail Migration) | 1 | 422s | 422s |
+| 10 (Mail Migration) | 3 | 1611s | 537s |
 
 **Recent Trend:**
-- Last 5 plans: 388s (09-01), 450s (09-02), 456s (09-03), 422s (10-01), avg: 429s
-- Trend: Phase 10 started — mail migration core engine in 7.0 min
+- Last 5 plans: 456s (09-03), 422s (10-01), 792s (10-02), 397s (10-03), avg: 517s
+- Trend: Phase 10 in progress — Provider integrations added in 6.6 min
 
 **Recent Plans:**
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
-| Phase 09 | P02 | 450s | 2 | 12 |
 | Phase 09 | P03 | 456s | 2 | 12 |
 | Phase 10 | P01 | 422s | 2 | 6 |
+| Phase 10 | P02 | 792s | 2 | 6 |
+| Phase 10 | P03 | 397s | 2 | 12 |
 
 ## Accumulated Context
 
@@ -197,6 +198,13 @@ Recent decisions affecting current work:
 - [10-01]: Outlook folder mappings: skip Clutter, map Deleted Items -> Trash
 - [10-01]: IMAP APPEND preserves INTERNALDATE and flags for chronological mailbox order
 - [10-01]: Folder-level migration tracking enables folder resume in future plans
+- [10-03]: Custom XOAUTH2 SASL client (go-sasl only has OAUTHBEARER, not XOAUTH2)
+- [10-03]: Provider registry pattern with init() registration to avoid import cycles
+- [10-03]: OAuth2 device flow (RFC 8628) for Gmail and Outlook per locked decision
+- [10-03]: iCloud requires app-specific passwords (2FA prerequisite documented)
+- [10-03]: MailCow API uses X-API-Key header authentication
+- [10-03]: Mailu API uses Bearer token authentication with fallback to IMAP-only
+- [10-03]: Generic provider supports flexible IMAP/CalDAV/CardDAV endpoint configuration
 
 ### Pending Todos
 
@@ -211,7 +219,7 @@ None — migration tool promoted to Phase 10.
 
 ## Session Continuity
 
-Last session: 2026-02-14
-Stopped at: Completed 10-01 IMAP migration core engine
-Resume file: .planning/phases/10-mail-migration/10-01-SUMMARY.md
-Next plan: Phase 10 Plan 02 (provider integrations) or continue with remaining Phase 10 plans
+Last session: 2026-02-15
+Stopped at: Completed 10-03 Provider integrations
+Resume file: .planning/phases/10-mail-migration/10-03-SUMMARY.md
+Next plan: Phase 10 Plan 04 (CLI wizard with dry-run and progress bars)
