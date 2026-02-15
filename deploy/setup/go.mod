@@ -14,6 +14,9 @@ require (
 	atomicgo.dev/schedule v0.1.0 // indirect
 	github.com/AlecAivazis/survey/v2 v2.3.7 // indirect
 	github.com/containerd/console v1.0.3 // indirect
+	github.com/emersion/go-ical v0.0.0-20250609112844-439c63cef608 // indirect
+	github.com/emersion/go-vcard v0.0.0-20241024213814-c9703dde27ff // indirect
+	github.com/emersion/go-webdav v0.7.0 // indirect
 	github.com/gookit/color v1.5.4 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
@@ -26,6 +29,7 @@ require (
 	github.com/pterm/pterm v0.12.79 // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
+	github.com/teambition/rrule-go v1.8.2 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
 	golang.org/x/mod v0.18.0 // indirect
 	golang.org/x/net v0.27.0 // indirect
