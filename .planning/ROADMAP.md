@@ -181,10 +181,13 @@ Plans:
   2. User can import contacts and calendars from CalDAV/CardDAV sources or .vcf/.ics exports
   3. MailCow users can migrate users, aliases, and mailboxes via API export
   4. CLI wizard guides user through migration with `darkpipe migrate --from <provider>`
-**Plans:** 0 plans
+**Plans:** 4 plans
 
 Plans:
-- [ ] TBD (run /gsd:plan-phase 10 to break down)
+- [ ] 10-01-PLAN.md -- IMAP migration core: resumable state tracking, IMAP sync engine with date/flag preservation, configurable folder mapping
+- [ ] 10-02-PLAN.md -- CalDAV/CardDAV sync engines with contact merge logic, .vcf and .ics file import handlers
+- [ ] 10-03-PLAN.md -- Provider integrations: Gmail/Outlook OAuth2 device flow, MailCow/Mailu API clients, iCloud/docker-mailserver/generic providers
+- [ ] 10-04-PLAN.md -- CLI wizard command (darkpipe-setup migrate), pterm progress display, dry-run preview, and phase integration test suite
 
 ## Progress
 
@@ -204,7 +207,7 @@ Note: Phases 5 and 6 can execute in parallel after their dependencies are met. P
 | 7. Build System & Deployment | 3/3 | Complete | 2026-02-14 |
 | 8. Device Profiles & Client Setup | 3/3 | Complete | 2026-02-14 |
 | 9. Monitoring & Observability | 3/3 | Complete | 2026-02-14 |
-| 10. Mail Migration | 0/0 | Not started | - |
+| 10. Mail Migration | 0/4 | Planned | - |
 
 ---
 *Roadmap created: 2026-02-08*
