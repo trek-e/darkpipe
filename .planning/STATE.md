@@ -10,17 +10,17 @@ See: .planning/PROJECT.md (updated 2026-02-08)
 ## Current Position
 
 Phase: 10 of 10 (Mail Migration)
-Plan: 3 of 4 (Provider integrations complete)
-Status: Completed 10-03 Provider integrations with OAuth2 and API clients
-Last activity: 2026-02-15 -- Completed Phase 10 Plan 03
+Plan: 4 of 4 (CLI wizard and test suite complete)
+Status: Completed 10-04 CLI wizard with dry-run and progress bars
+Last activity: 2026-02-15 -- Completed Phase 10 Plan 04 (PHASE 10 COMPLETE)
 
-Progress: [█████████░] 92%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 29
-- Average duration: 6.0 minutes
+- Total plans completed: 30
+- Average duration: 5.8 minutes
 - Total execution time: 2.9 hours
 
 **By Phase:**
@@ -36,19 +36,19 @@ Progress: [█████████░] 92%
 | 07 (Build System & Deployment) | 3 | 1245s | 415s |
 | 08 (Device Profiles & Client Setup) | 3 | 1274s | 425s |
 | 09 (Monitoring & Observability) | 3 | 1294s | 431s |
-| 10 (Mail Migration) | 3 | 1611s | 537s |
+| 10 (Mail Migration) | 4 | 1766s | 442s |
 
 **Recent Trend:**
-- Last 5 plans: 456s (09-03), 422s (10-01), 792s (10-02), 397s (10-03), avg: 517s
-- Trend: Phase 10 in progress — Provider integrations added in 6.6 min
+- Last 5 plans: 422s (10-01), 792s (10-02), 397s (10-03), 155s (10-04), avg: 442s
+- Trend: Phase 10 complete — CLI wizard added in 2.6 min
 
 **Recent Plans:**
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
-| Phase 09 | P03 | 456s | 2 | 12 |
 | Phase 10 | P01 | 422s | 2 | 6 |
 | Phase 10 | P02 | 792s | 2 | 6 |
 | Phase 10 | P03 | 397s | 2 | 12 |
+| Phase 10 | P04 | 155s | 2 | 8 |
 
 ## Accumulated Context
 
@@ -205,10 +205,15 @@ Recent decisions affecting current work:
 - [10-03]: MailCow API uses X-API-Key header authentication
 - [10-03]: Mailu API uses Bearer token authentication with fallback to IMAP-only
 - [10-03]: Generic provider supports flexible IMAP/CalDAV/CardDAV endpoint configuration
+- [Phase 10-04]: Dry-run by default (--apply flag required) for safe migration operations
+- [Phase 10-04]: OAuth2 credentials via environment variables (GMAIL_CLIENT_ID, OUTLOOK_CLIENT_ID)
+- [Phase 10-04]: Progress bars with automatic terminal detection and log-style fallback
+- [Phase 10-04]: Provider-agnostic wizard using Provider.WizardPrompts() for extensibility
+- [Phase 10-04]: Destination defaults: localhost:993 (IMAP), localhost:5232 (CalDAV/CardDAV)
 
 ### Pending Todos
 
-None — migration tool promoted to Phase 10.
+None — Phase 10 complete. All v1 requirements implemented.
 
 ### Blockers/Concerns
 
@@ -220,6 +225,6 @@ None — migration tool promoted to Phase 10.
 ## Session Continuity
 
 Last session: 2026-02-15
-Stopped at: Completed 10-03 Provider integrations
-Resume file: .planning/phases/10-mail-migration/10-03-SUMMARY.md
-Next plan: Phase 10 Plan 04 (CLI wizard with dry-run and progress bars)
+Stopped at: Completed 10-04 CLI wizard and test suite (PHASE 10 COMPLETE)
+Resume file: .planning/phases/10-mail-migration/10-04-SUMMARY.md
+Next plan: Phase 10 complete — ready for milestone verification and v1 release preparation
