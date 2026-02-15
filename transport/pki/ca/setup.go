@@ -1,3 +1,7 @@
+// Copyright (C) 2026 The Artificer of Ciphers, LLC. All rights reserved.
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+
 // Package ca provides helpers for initializing a step-ca private certificate
 // authority and issuing/inspecting certificates. All certificate operations
 // shell out to the step CLI rather than re-implementing crypto -- the official

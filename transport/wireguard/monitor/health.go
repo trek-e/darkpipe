@@ -1,3 +1,7 @@
+// Copyright (C) 2026 The Artificer of Ciphers, LLC. All rights reserved.
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+
 // Package monitor provides WireGuard tunnel health monitoring via handshake
 // timestamp inspection. It uses wgctrl to read the kernel (or userspace)
 // WireGuard device state and alerts when the latest handshake exceeds a

@@ -1,3 +1,7 @@
+// Copyright (C) 2026 The Artificer of Ciphers, LLC. All rights reserved.
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+
 // Package health provides a unified transport health checker that reports
 // the status of whichever transport is active (WireGuard or mTLS). This
 // gives Phase 9 (monitoring) a single interface to query regardless of

@@ -1,3 +1,7 @@
+// Copyright (C) 2026 The Artificer of Ciphers, LLC. All rights reserved.
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+
 // Package server provides an mTLS listener for the cloud relay side of
 // DarkPipe's alternative transport. The server requires mutual TLS -- every
 // connecting client must present a certificate signed by the same internal CA.

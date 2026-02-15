@@ -1,3 +1,7 @@
+// Copyright (C) 2026 The Artificer of Ciphers, LLC. All rights reserved.
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+
 // Package testutil provides helpers for generating ephemeral TLS certificates
 // used in mTLS tests. All certificates are created in memory using
 // crypto/x509 and crypto/ecdsa from the standard library.

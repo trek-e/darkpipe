@@ -1,3 +1,7 @@
+// Copyright (C) 2026 The Artificer of Ciphers, LLC. All rights reserved.
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+
 // Package ephemeral provides verification that no mail content persists on disk after forwarding.
 //
 // The cloud relay must be ephemeral per RELAY-02: no mail should remain on the filesystem

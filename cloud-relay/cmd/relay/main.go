@@ -1,3 +1,7 @@
+// Copyright (C) 2026 The Artificer of Ciphers, LLC. All rights reserved.
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+
 // Package main provides the entrypoint for the cloud relay daemon.
 //
 // The relay daemon listens on localhost:10025 for SMTP connections from

@@ -1,3 +1,7 @@
+// Copyright (C) 2026 The Artificer of Ciphers, LLC. All rights reserved.
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+
 // Package health provides a unified health check framework with liveness
 // and readiness separation for monitoring all DarkPipe mail services.
 package health

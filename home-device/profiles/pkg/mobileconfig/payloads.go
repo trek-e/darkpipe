@@ -1,3 +1,7 @@
+// Copyright (C) 2026 The Artificer of Ciphers, LLC. All rights reserved.
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+
 package mobileconfig
 
 // MobileConfigProfile represents the top-level Apple Configuration Profile.

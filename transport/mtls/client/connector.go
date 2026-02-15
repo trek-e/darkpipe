@@ -1,3 +1,7 @@
+// Copyright (C) 2026 The Artificer of Ciphers, LLC. All rights reserved.
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+
 // Package client provides an mTLS client for the home-device side of
 // DarkPipe's alternative transport. The client maintains a persistent
 // connection to the cloud relay with exponential backoff reconnection
