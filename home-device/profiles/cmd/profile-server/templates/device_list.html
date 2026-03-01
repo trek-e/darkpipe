@@ -7,26 +7,27 @@
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <div class="container">
         <header>
             <h1>DarkPipe</h1>
             <p class="subtitle">Device Management</p>
         </header>
 
-        <nav>
-            <a href="/devices">My Devices</a>
+        <nav aria-label="Main navigation">
+            <a href="/devices" aria-current="page">My Devices</a>
             <a href="/devices/add" class="button-primary">Add Device</a>
         </nav>
 
         {{if .Error}}
-        <div class="alert alert-error">{{.Error}}</div>
+        <div class="alert alert-error" role="alert">{{.Error}}</div>
         {{end}}
 
         {{if .Success}}
-        <div class="alert alert-success">{{.Success}}</div>
+        <div class="alert alert-success" role="alert">{{.Success}}</div>
         {{end}}
 
-        <main>
+        <main id="main-content">
             <h2>Your Devices</h2>
             <p class="info">Manage app passwords for your email devices. Each device has its own password for security.</p>
 
@@ -34,10 +35,10 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Device Name</th>
-                        <th>Created</th>
-                        <th>Last Used</th>
-                        <th>Action</th>
+                        <th scope="col">Device Name</th>
+                        <th scope="col">Created</th>
+                        <th scope="col">Last Used</th>
+                        <th scope="col">Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -53,9 +54,9 @@
                             {{end}}
                         </td>
                         <td>
-                            <form method="POST" action="/devices/revoke" onsubmit="return confirm('Are you sure you want to revoke access for this device?');" style="display: inline;">
+                            <form method="POST" action="/devices/revoke" onsubmit="return confirm('Revoke access for {{.DeviceName}}?');" style="display: inline;">
                                 <input type="hidden" name="device_id" value="{{.ID}}">
-                                <button type="submit" class="button-danger">Revoke</button>
+                                <button type="submit" class="button-danger">Revoke <span class="visually-hidden">access for {{.DeviceName}}</span></button>
                             </form>
                         </td>
                     </tr>

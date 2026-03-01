@@ -7,37 +7,40 @@
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <div class="container">
         <header>
             <h1>DarkPipe</h1>
             <p class="subtitle">Device Setup</p>
         </header>
 
-        <nav>
+        <nav aria-label="Main navigation">
             <a href="/devices">My Devices</a>
             <a href="/devices/add">Add Another Device</a>
         </nav>
 
-        <main>
+        <main id="main-content">
             <div class="success-header">
                 <h2>Device Created: {{.DeviceName}}</h2>
                 <p>Your app password has been generated</p>
             </div>
 
-            <div class="alert alert-warning">
+            <div class="alert alert-warning" role="alert">
                 <strong>Important:</strong> This is the only time you will see this password. Save it now!
             </div>
 
             <div class="password-display">
-                <label>App Password:</label>
-                <code class="app-password">{{.AppPassword}}</code>
+                <p id="app-password-label"><strong>App Password:</strong></p>
+                <code class="app-password" aria-labelledby="app-password-label">{{.AppPassword}}</code>
             </div>
 
             {{if .QRCodeData}}
             <div class="qr-section">
                 <h3>Quick Setup</h3>
                 <p>Scan this QR code with your device:</p>
-                <img src="data:image/png;base64,{{.QRCodeData}}" alt="QR Code" class="qr-code">
+                <img src="data:image/png;base64,{{.QRCodeData}}"
+                     alt="QR code for {{.Platform}} device configuration — scan to set up email on this device"
+                     class="qr-code">
             </div>
             {{end}}
 

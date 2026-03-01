@@ -7,35 +7,38 @@
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <div class="container">
         <header>
             <h1>DarkPipe</h1>
             <p class="subtitle">Add New Device</p>
         </header>
 
-        <nav>
+        <nav aria-label="Main navigation">
             <a href="/devices">My Devices</a>
-            <a href="/devices/add" class="button-primary">Add Device</a>
+            <a href="/devices/add" class="button-primary" aria-current="page">Add Device</a>
         </nav>
 
         {{if .Error}}
-        <div class="alert alert-error">{{.Error}}</div>
+        <div class="alert alert-error" role="alert">{{.Error}}</div>
         {{end}}
 
-        <main>
+        <main id="main-content">
             <h2>Add a New Device</h2>
             <p class="info">Configure email on a new device. Choose your platform for optimized setup instructions.</p>
 
             <form method="POST" action="/devices/add">
                 <div class="form-group">
                     <label for="device_name">Device Name</label>
-                    <input type="text" id="device_name" name="device_name" required placeholder="e.g., iPhone 15, Work Laptop">
-                    <p class="help-text">Choose a name you'll recognize later</p>
+                    <input type="text" id="device_name" name="device_name" required
+                           placeholder="e.g., iPhone 15, Work Laptop"
+                           aria-describedby="device_name_hint">
+                    <p class="help-text" id="device_name_hint">Choose a name you'll recognize later</p>
                 </div>
 
                 <div class="form-group">
                     <label for="platform">Platform</label>
-                    <select id="platform" name="platform" required>
+                    <select id="platform" name="platform" required aria-describedby="platform_hint">
                         <option value="">Select your platform...</option>
                         <option value="ios">iOS (iPhone/iPad)</option>
                         <option value="macos">macOS</option>
@@ -44,7 +47,7 @@
                         <option value="outlook">Outlook</option>
                         <option value="other">Other / Manual Setup</option>
                     </select>
-                    <p class="help-text">We'll provide platform-specific setup instructions</p>
+                    <p class="help-text" id="platform_hint">We'll provide platform-specific setup instructions</p>
                 </div>
 
                 <div class="form-actions">
