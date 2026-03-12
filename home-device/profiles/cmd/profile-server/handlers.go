@@ -10,14 +10,29 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
+	"strings"
 	"time"
 
+	"github.com/darkpipe/darkpipe/profiles/internal/logutil"
 	"github.com/darkpipe/darkpipe/profiles/pkg/apppassword"
 	"github.com/darkpipe/darkpipe/profiles/pkg/autoconfig"
 	"github.com/darkpipe/darkpipe/profiles/pkg/autodiscover"
 	"github.com/darkpipe/darkpipe/profiles/pkg/mobileconfig"
 	"github.com/darkpipe/darkpipe/profiles/pkg/qrcode"
 )
+
+// profileDebug controls whether full email addresses are logged.
+// Set PROFILE_DEBUG=true to enable verbose logging.
+var profileDebug = strings.EqualFold(os.Getenv("PROFILE_DEBUG"), "true")
+
+// logEmail returns the email address redacted for logging, unless PROFILE_DEBUG is set.
+func logEmail(email string) string {
+	if profileDebug {
+		return email
+	}
+	return logutil.RedactEmail(email)
+}
 
 // ServerConfig holds the configuration for the profile server.
 type ServerConfig struct {
@@ -106,7 +121,7 @@ func (h *ProfileHandler) HandleProfileDownload(w http.ResponseWriter, r *http.Re
 	w.WriteHeader(http.StatusOK)
 	w.Write(profileData)
 
-	log.Printf("Profile downloaded for %s (token: %s, device: %s)", email, token[:8], deviceName)
+	log.Printf("Profile downloaded for %s (token: %s, device: %s)", logEmail(email), token[:8], deviceName)
 }
 
 // HandleAutoconfig handles GET /mail/config-v1.1.xml?emailaddress=<email>
@@ -209,7 +224,7 @@ func (h *ProfileHandler) HandleQRGenerate(w http.ResponseWriter, r *http.Request
 	w.WriteHeader(http.StatusOK)
 	w.Write(png)
 
-	log.Printf("QR code generated for %s", email)
+	log.Printf("QR code generated for %s", logEmail(email))
 }
 
 // HandleQRImage handles GET /qr/image?email=<email>
@@ -298,7 +313,7 @@ func LogRequest(next http.Handler) http.Handler {
 		logEntry := map[string]interface{}{
 			"method":     r.Method,
 			"path":       r.URL.Path,
-			"query":      r.URL.RawQuery,
+			"query":      logutil.RedactQueryParams(r.URL.RawQuery),
 			"status":     lw.statusCode,
 			"duration":   time.Since(start).Milliseconds(),
 			"remote":     r.RemoteAddr,

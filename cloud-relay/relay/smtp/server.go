@@ -16,12 +16,14 @@ import (
 // Backend implements smtp.Backend from emersion/go-smtp.
 type Backend struct {
 	forwarder forward.Forwarder
+	debug     bool
 }
 
 // NewBackend creates a new SMTP backend.
-func NewBackend(forwarder forward.Forwarder) *Backend {
+func NewBackend(forwarder forward.Forwarder, debug bool) *Backend {
 	return &Backend{
 		forwarder: forwarder,
+		debug:     debug,
 	}
 }
 
@@ -29,12 +31,13 @@ func NewBackend(forwarder forward.Forwarder) *Backend {
 func (b *Backend) NewSession(c *smtp.Conn) (smtp.Session, error) {
 	return &Session{
 		forwarder: b.forwarder,
+		debug:     b.debug,
 	}, nil
 }
 
 // NewServer creates a configured SMTP server.
 func NewServer(forwarder forward.Forwarder, cfg *config.Config) *smtp.Server {
-	backend := NewBackend(forwarder)
+	backend := NewBackend(forwarder, cfg.RelayDebug)
 
 	s := smtp.NewServer(backend)
 	s.Addr = cfg.ListenAddr

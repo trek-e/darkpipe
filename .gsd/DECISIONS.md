@@ -81,3 +81,8 @@
 - "Root containers (relay, postfix-dovecot, stalwart, maddy) hardened with cap_drop ALL + selective cap_add instead of non-root USER"
 - "read_only: true on all compose services with explicit tmpfs for writable paths"
 - "HEALTHCHECK in all 5 custom Dockerfiles for standalone docker run defense-in-depth"
+- "Targeted PII redaction at log call sites rather than slog migration (redaction is orthogonal to logging framework)"
+- "Duplicate RedactEmail function across cloud-relay and profile-server modules (trivial 5-line function, separate go.mod modules can't share internal packages)"
+- "Redact email local-part only, preserve domain (domain needed for multi-domain debugging)"
+- "RELAY_DEBUG and PROFILE_DEBUG env vars gate verbose logging per-binary (separate binaries need separate flags)"
+- "token[:8] prefix logging is acceptable (256-bit token, 8 chars not reconstructible, single-use)"

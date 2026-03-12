@@ -40,6 +40,9 @@ type Config struct {
 	QueueTTLHours     int    // Max age before purge (default 168 = 7 days)
 	QueueSnapshotPath string // Path for queue metadata snapshots
 
+	// Debug logging — when true, logs full email addresses instead of redacted
+	RelayDebug bool
+
 	// S3 overflow configuration (QUEUE-02, optional)
 	OverflowEnabled   bool
 	OverflowEndpoint  string // e.g., "gateway.storjshare.io" or "s3.amazonaws.com"
@@ -69,6 +72,7 @@ func LoadFromEnv() (*Config, error) {
 		QueueMaxMessages:  int(getEnvInt64("RELAY_QUEUE_MAX_MESSAGES", 10000)),                 // 10k messages
 		QueueTTLHours:     int(getEnvInt64("RELAY_QUEUE_TTL_HOURS", 168)),                      // 7 days
 		QueueSnapshotPath: getEnv("RELAY_QUEUE_SNAPSHOT_PATH", "/data/queue-state/snapshot.json"), // Default path
+		RelayDebug:        getEnvBool("RELAY_DEBUG", false),
 		OverflowEnabled:   getEnvBool("RELAY_OVERFLOW_ENABLED", false),                         // Disabled by default (requires S3 credentials)
 		OverflowEndpoint:  getEnv("RELAY_OVERFLOW_ENDPOINT", ""),
 		OverflowBucket:    getEnv("RELAY_OVERFLOW_BUCKET", "darkpipe-queue"),

@@ -16,6 +16,7 @@ import (
 
 	"github.com/darkpipe/darkpipe/profiles/pkg/apppassword"
 	"github.com/darkpipe/darkpipe/profiles/pkg/qrcode"
+
 )
 
 //go:embed templates/*.html static/*.css
@@ -94,7 +95,7 @@ func (h *WebUIHandler) HandleDeviceList(w http.ResponseWriter, r *http.Request) 
 	// List app passwords for this user
 	appPasswords, err := h.AppPassStore.List(email)
 	if err != nil {
-		log.Printf("Failed to list app passwords for %s: %v", email, err)
+		log.Printf("Failed to list app passwords for %s: %v", logEmail(email), err)
 		h.renderDeviceList(w, email, nil, "Failed to load devices", "")
 		return
 	}

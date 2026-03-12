@@ -39,7 +39,7 @@ This milestone is complete only when all are true:
 
 - [x] **S01: Container Security Hardening** `risk:medium` `depends:[]`
   > After this: All 5 Dockerfiles specify non-root USER (or document root justification with cap_drop/security_opt), Docker Compose files include read_only, no-new-privileges, and cap_drop directives.
-- [ ] **S02: Log Hygiene & PII Redaction** `risk:low` `depends:[]`
+- [x] **S02: Log Hygiene & PII Redaction** `risk:low` `depends:[]`
   > After this: SMTP session logs redact email addresses at default verbosity, token logging is behind a debug flag, and no credentials appear in any log output.
 - [ ] **S03: TLS & Input Hardening** `risk:low` `depends:[]`
   > After this: All 7 provider IMAP clients specify MinVersion: tls.VersionTLS12 explicitly, SMTP DATA handler enforces a configurable message size limit, and template.HTML usage is audited safe.

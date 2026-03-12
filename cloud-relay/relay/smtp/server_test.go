@@ -16,7 +16,7 @@ func TestNewBackend(t *testing.T) {
 	t.Parallel()
 
 	mockFwd := forward.NewMockForwarder()
-	backend := NewBackend(mockFwd)
+	backend := NewBackend(mockFwd, false)
 
 	if backend == nil {
 		t.Fatal("NewBackend returned nil")
@@ -31,7 +31,7 @@ func TestBackend_NewSession(t *testing.T) {
 	t.Parallel()
 
 	mockFwd := forward.NewMockForwarder()
-	backend := NewBackend(mockFwd)
+	backend := NewBackend(mockFwd, false)
 
 	session, err := backend.NewSession(nil)
 	if err != nil {
