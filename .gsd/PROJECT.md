@@ -19,6 +19,9 @@ Your email lives on your hardware, encrypted in transit, never stored on someone
 - Stalwart 0.15.4 is pre-v1.0 (v1.0 expected Q2 2026) — schema may change
 - VPS port 25 restrictions are deployment-specific — provider validation required
 - IP warmup requires 4-6 weeks after deployment — time-based, not development
+- Pre-existing test failures in `monitoring/cert` (certificate renewal threshold logic) — not introduced by M002
+
+**Post-launch hardening (M002):** All containers run with minimal privileges (cap_drop ALL, no-new-privileges, read_only), logs redact PII by default, all provider IMAP clients enforce TLS 1.2+, SMTP relay enforces configurable message size limit, and `.env.example` files document all configuration.
 
 ## Requirements
 
@@ -115,7 +118,7 @@ Your email lives on your hardware, encrypted in transit, never stored on someone
 | Milestone | Status | Completed |
 |-----------|--------|-----------|
 | M001: MVP (Phases 1-10) | ✓ Shipped | 2026-02-15 |
-| M002: Post-Launch Hardening | Planning | — |
+| M002: Post-Launch Hardening | ✓ Complete | 2026-03-12 |
 
 ---
-*Last updated: 2026-03-11 after M001 summary*
+*Last updated: 2026-03-12 after M002 completion*
