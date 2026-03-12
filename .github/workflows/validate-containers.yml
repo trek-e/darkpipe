@@ -24,7 +24,7 @@ jobs:
     name: Docker Compose & Script Validation
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Docker version
         run: docker version
@@ -69,7 +69,7 @@ jobs:
     name: Podman Build & Compose Validation
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Podman version
         run: podman version
