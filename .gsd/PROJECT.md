@@ -124,6 +124,7 @@ Your email lives on your hardware, encrypted in transit, never stored on someone
 | M001: MVP (Phases 1-10) | ✓ Shipped | 2026-02-15 |
 | M002: Post-Launch Hardening | ✓ Complete | 2026-03-12 |
 | M003: Container Runtime Compatibility | ✓ Complete | 2026-03-12 |
+| M004: DarkPipe Website (darkpipe.org) | In Progress | — |
 
 ---
-*Last updated: 2026-03-12 after M003 completion*
+*Last updated: 2026-03-12 after M004 creation*
