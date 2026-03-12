@@ -3,8 +3,18 @@ name: Validate Containers
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - 'website/**'
+      - 'docs/**'
+      - '*.md'
+      - '.gsd/**'
   pull_request:
     branches: [main]
+    paths-ignore:
+      - 'website/**'
+      - 'docs/**'
+      - '*.md'
+      - '.gsd/**'
 
 permissions:
   contents: read

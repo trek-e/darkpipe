@@ -59,7 +59,6 @@ services:
       - KILL
     read_only: true
     tmpfs:
-      - /var/spool/postfix
       - /var/lib/postfix
       - /tmp
       - /run
