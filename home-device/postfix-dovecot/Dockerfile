@@ -27,8 +27,9 @@ RUN apk add --no-cache \
 
 # Create vmail user for virtual mailbox ownership (UID/GID 5000)
 # Virtual mailboxes don't use system users - all mail owned by vmail
-RUN addgroup -g 5000 vmail && \
-    adduser -D -u 5000 -G vmail -h /var/mail/vhosts -s /sbin/nologin vmail
+# Create vmail user/group if not already present (dovecot may create them)
+RUN getent group vmail >/dev/null 2>&1 || addgroup -g 5000 vmail; \
+    getent passwd vmail >/dev/null 2>&1 || adduser -D -u 5000 -G vmail -h /var/mail/vhosts -s /sbin/nologin vmail
 
 # Create virtual mailbox base directory
 RUN mkdir -p /var/mail/vhosts && \
