@@ -1,0 +1,5 @@
+# Cloudflare Pages redirects
+# https://developers.cloudflare.com/pages/configuration/redirects/
+
+# Trailing slash normalization (Cloudflare Pages handles this by default)
+# Add explicit redirects here if needed in the future

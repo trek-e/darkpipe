@@ -1,0 +1,92 @@
+---
+import ArchitectureDiagram from './ArchitectureDiagram.astro';
+---
+
+<section class="relative overflow-hidden pt-32 pb-20 md:pt-40 md:pb-28" aria-labelledby="hero-heading">
+  <!-- Background atmosphere -->
+  <div class="pointer-events-none absolute inset-0" aria-hidden="true">
+    <!-- Gradient mesh -->
+    <div class="absolute top-0 left-1/4 h-[600px] w-[600px] rounded-full bg-pipe/[0.03] blur-[120px]"></div>
+    <div class="absolute bottom-0 right-1/4 h-[400px] w-[400px] rounded-full bg-pipe/[0.02] blur-[100px]"></div>
+    <!-- Grid overlay -->
+    <div class="absolute inset-0 opacity-[0.03]" style="background-image: linear-gradient(var(--color-ghost) 1px, transparent 1px), linear-gradient(90deg, var(--color-ghost) 1px, transparent 1px); background-size: 60px 60px;"></div>
+    <!-- Top fade -->
+    <div class="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-void to-transparent"></div>
+  </div>
+
+  <div class="relative mx-auto max-w-6xl px-6">
+    <!-- Tagline badge -->
+    <div class="animate-fade-up mb-8 flex justify-center">
+      <div class="inline-flex items-center gap-2 rounded-full border border-pipe/20 bg-pipe/[0.06] px-4 py-1.5">
+        <span class="relative flex h-2 w-2">
+          <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-pipe opacity-75"></span>
+          <span class="relative inline-flex h-2 w-2 rounded-full bg-pipe"></span>
+        </span>
+        <span class="font-mono text-xs font-medium tracking-wider text-pipe">v1.0 SHIPPED · OPEN SOURCE · AGPLv3</span>
+      </div>
+    </div>
+
+    <!-- Headline -->
+    <div class="mx-auto max-w-4xl text-center">
+      <h1 id="hero-heading" class="animate-fade-up-delay-1 font-display text-4xl font-bold leading-[1.1] tracking-tight text-snow sm:text-5xl md:text-6xl lg:text-7xl">
+        Your email lives on
+        <span class="relative inline-block">
+          <span class="relative z-10 text-pipe">your hardware</span>
+          <span class="absolute inset-x-0 bottom-1 h-3 bg-pipe/10 md:bottom-2 md:h-4" aria-hidden="true"></span>
+        </span>
+      </h1>
+
+      <p class="animate-fade-up-delay-2 mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-mist md:text-xl">
+        DarkPipe is a self-hosted email sovereignty stack. A minimal cloud relay receives and sends your mail, then securely transports it — <strong class="font-semibold text-cloud">without storing it</strong> — to a mail server on hardware you control.
+      </p>
+
+      <!-- CTAs -->
+      <div class="animate-fade-up-delay-3 mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+        <a
+          href="/quickstart"
+          class="group inline-flex items-center gap-2.5 rounded-lg bg-pipe px-6 py-3.5 text-sm font-semibold text-void shadow-lg shadow-pipe/20 transition-all hover:bg-pipe-bright hover:shadow-pipe/30"
+        >
+          Get Started
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="transition-transform group-hover:translate-x-0.5" aria-hidden="true">
+            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </a>
+        <a
+          href="https://github.com/trek-e/darkpipe"
+          class="inline-flex items-center gap-2.5 rounded-lg border border-slate-mid bg-slate-deep/50 px-6 py-3.5 text-sm font-semibold text-cloud transition-all hover:border-slate-light hover:bg-slate-mid/50 hover:text-snow"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
+          </svg>
+          View on GitHub
+        </a>
+      </div>
+
+      <!-- Stats row -->
+      <div class="animate-fade-up-delay-4 mt-14 flex flex-wrap items-center justify-center gap-x-10 gap-y-4 text-sm">
+        <div class="flex items-center gap-2 text-ghost">
+          <span class="font-mono font-medium text-snow">38K</span> lines of Go
+        </div>
+        <div class="hidden h-4 w-px bg-slate-mid sm:block" aria-hidden="true"></div>
+        <div class="flex items-center gap-2 text-ghost">
+          <span class="font-mono font-medium text-snow">3</span> mail server options
+        </div>
+        <div class="hidden h-4 w-px bg-slate-mid sm:block" aria-hidden="true"></div>
+        <div class="flex items-center gap-2 text-ghost">
+          <span class="font-mono font-medium text-snow">7</span> migration providers
+        </div>
+        <div class="hidden h-4 w-px bg-slate-mid sm:block" aria-hidden="true"></div>
+        <div class="flex items-center gap-2 text-ghost">
+          <span class="font-mono font-medium text-snow">arm64</span> + x64
+        </div>
+      </div>
+    </div>
+
+    <!-- Architecture Diagram -->
+    <div class="mt-20 md:mt-24">
+      <ArchitectureDiagram />
+    </div>
+  </div>
+</section>

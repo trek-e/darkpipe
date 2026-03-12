@@ -1,0 +1,56 @@
+---
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="border-t border-slate-mid/40 bg-abyss" role="contentinfo">
+  <div class="mx-auto max-w-6xl px-6 py-12">
+    <div class="flex flex-col items-center gap-8 md:flex-row md:justify-between">
+      <!-- Brand -->
+      <div class="flex flex-col items-center gap-3 md:items-start">
+        <a href="/" class="font-display text-lg font-bold tracking-tight text-snow" aria-label="DarkPipe home">
+          dark<span class="text-pipe">pipe</span>
+        </a>
+        <p class="text-sm text-ghost">
+          Your email. Your hardware. Your rules.
+        </p>
+      </div>
+
+      <!-- Links -->
+      <nav aria-label="Footer navigation">
+        <ul class="flex flex-wrap items-center justify-center gap-6 text-sm" role="list">
+          <li><a href="/features" class="text-mist transition-colors hover:text-pipe">Features</a></li>
+          <li><a href="/quickstart" class="text-mist transition-colors hover:text-pipe">Quickstart</a></li>
+          <li><a href="/faq" class="text-mist transition-colors hover:text-pipe">FAQ</a></li>
+          <li>
+            <a
+              href="https://github.com/trek-e/darkpipe"
+              class="text-mist transition-colors hover:text-pipe"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              GitHub
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://github.com/trek-e/darkpipe/discussions"
+              class="text-mist transition-colors hover:text-pipe"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Discussions
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- Bottom -->
+    <div class="mt-8 flex flex-col items-center gap-2 border-t border-slate-mid/30 pt-6 text-xs text-ghost md:flex-row md:justify-between">
+      <p>© {currentYear} DarkPipe. AGPLv3 Licensed.</p>
+      <p>
+        Built for people who believe email privacy is not optional.
+      </p>
+    </div>
+  </div>
+</footer>

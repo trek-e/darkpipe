@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#07080a"/>
+  <rect x="0" y="620" width="1200" height="10" fill="#22d3a7" opacity="0.6"/>
+  <!-- Logo pipes -->
+  <rect x="480" y="200" width="30" height="120" rx="4" fill="#22d3a7"/>
+  <rect x="690" y="200" width="30" height="120" rx="4" fill="#22d3a7"/>
+  <rect x="510" y="240" width="180" height="40" rx="4" fill="#22d3a7" opacity="0.4"/>
+  <!-- Text -->
+  <text x="600" y="400" text-anchor="middle" font-family="monospace" font-size="48" font-weight="bold" fill="#f1f5f9">dark<tspan fill="#22d3a7">pipe</tspan></text>
+  <text x="600" y="450" text-anchor="middle" font-family="sans-serif" font-size="20" fill="#94a3b8">Your email. Your hardware. Your rules.</text>
+  <text x="600" y="490" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#64748b">Self-hosted email sovereignty stack · Open Source · AGPLv3</text>
+</svg>

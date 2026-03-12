@@ -1,0 +1,108 @@
+---
+const features = [
+  {
+    title: 'Choose Your Mail Server',
+    description: 'Stalwart (modern, all-in-one with JMAP), Maddy (minimal Go binary), or Postfix+Dovecot (battle-tested). Your stack, your choice.',
+    icon: 'server',
+  },
+  {
+    title: 'Encrypted Transport',
+    description: 'WireGuard tunnel or mTLS — mail moves encrypted between your cloud relay and home device. Zero-knowledge relay, zero storage.',
+    icon: 'lock',
+  },
+  {
+    title: 'Offline Queuing',
+    description: 'Home device goes offline? Mail queues encrypted on the relay with S3-compatible overflow. Drains automatically on reconnect.',
+    icon: 'queue',
+  },
+  {
+    title: 'Spam Filtering',
+    description: 'Rspamd with greylisting, SPF/DKIM/DMARC validation, and conservative thresholds. Tunable to your comfort level.',
+    icon: 'shield',
+  },
+  {
+    title: 'Device Onboarding',
+    description: 'QR codes, Apple .mobileconfig profiles, Thunderbird/Outlook autodiscovery. One-tap setup for every device in the house.',
+    icon: 'device',
+  },
+  {
+    title: 'Migration Tools',
+    description: 'Migrate from Gmail, Outlook, Yahoo, iCloud, Fastmail, ProtonMail, or Zoho. CLI wizard with dry-run mode. Bring your mail home.',
+    icon: 'migrate',
+  },
+];
+---
+
+<section class="relative py-20 md:py-28" aria-labelledby="features-heading">
+  <!-- Background -->
+  <div class="pointer-events-none absolute inset-0" aria-hidden="true">
+    <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-slate-mid/50 to-transparent"></div>
+  </div>
+
+  <div class="relative mx-auto max-w-6xl px-6">
+    <!-- Section header -->
+    <div class="mx-auto max-w-2xl text-center">
+      <h2 id="features-heading" class="font-display text-2xl font-bold tracking-tight text-snow md:text-3xl">
+        Everything you need for email sovereignty
+      </h2>
+      <p class="mt-4 text-mist">
+        A complete stack — from DNS authentication to webmail — running on hardware you physically control.
+      </p>
+    </div>
+
+    <!-- Feature grid -->
+    <div class="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3" role="list">
+      {features.map((feature) => (
+        <article class="group rounded-xl border border-slate-mid/40 bg-abyss/60 p-6 transition-all hover:border-pipe/20 hover:bg-slate-deep/50" role="listitem">
+          <div class="mb-4 flex h-10 w-10 items-center justify-center rounded-lg border border-slate-mid/50 bg-slate-deep transition-colors group-hover:border-pipe/30 group-hover:bg-pipe/[0.06]">
+            {feature.icon === 'server' && (
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <rect x="3" y="3" width="14" height="5" rx="1" stroke="var(--color-pipe)" stroke-width="1.2" />
+                <rect x="3" y="12" width="14" height="5" rx="1" stroke="var(--color-pipe)" stroke-width="1.2" />
+                <circle cx="6" cy="5.5" r="1" fill="var(--color-pipe)" />
+                <circle cx="6" cy="14.5" r="1" fill="var(--color-pipe)" />
+                <path d="M10 8v4" stroke="var(--color-ghost)" stroke-width="1" stroke-dasharray="2 2" />
+              </svg>
+            )}
+            {feature.icon === 'lock' && (
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <rect x="4" y="9" width="12" height="8" rx="2" stroke="var(--color-pipe)" stroke-width="1.2" />
+                <path d="M7 9V6a3 3 0 016 0v3" stroke="var(--color-pipe)" stroke-width="1.2" stroke-linecap="round" />
+                <circle cx="10" cy="13" r="1.5" fill="var(--color-pipe)" />
+              </svg>
+            )}
+            {feature.icon === 'queue' && (
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <path d="M4 5h12M4 10h12M4 15h8" stroke="var(--color-pipe)" stroke-width="1.2" stroke-linecap="round" />
+                <path d="M14 13l2 2 2-2" stroke="var(--color-pipe)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M16 15v-4" stroke="var(--color-pipe)" stroke-width="1.2" stroke-linecap="round" />
+              </svg>
+            )}
+            {feature.icon === 'shield' && (
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <path d="M10 2L3 6v4c0 4.4 3 8.5 7 9.5 4-1 7-5.1 7-9.5V6l-7-4z" stroke="var(--color-pipe)" stroke-width="1.2" stroke-linejoin="round" />
+                <path d="M7 10l2 2 4-4" stroke="var(--color-pipe)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            )}
+            {feature.icon === 'device' && (
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <rect x="5" y="2" width="10" height="16" rx="2" stroke="var(--color-pipe)" stroke-width="1.2" />
+                <circle cx="10" cy="15" r="1" fill="var(--color-pipe)" />
+                <path d="M8 5h4" stroke="var(--color-ghost)" stroke-width="1" stroke-linecap="round" />
+              </svg>
+            )}
+            {feature.icon === 'migrate' && (
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <path d="M4 10h12" stroke="var(--color-pipe)" stroke-width="1.2" stroke-linecap="round" />
+                <path d="M12 6l4 4-4 4" stroke="var(--color-pipe)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M4 6V4h4M4 14v2h4" stroke="var(--color-ghost)" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            )}
+          </div>
+          <h3 class="font-display text-sm font-bold tracking-tight text-snow">{feature.title}</h3>
+          <p class="mt-2 text-sm leading-relaxed text-mist">{feature.description}</p>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>

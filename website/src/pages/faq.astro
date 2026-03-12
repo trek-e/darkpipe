@@ -1,0 +1,169 @@
+---
+import Base from '../layouts/Base.astro';
+
+const categories = [
+  {
+    name: 'General',
+    questions: [
+      {
+        q: 'What is DarkPipe?',
+        a: 'DarkPipe is a complete self-hosted email infrastructure that separates internet-facing mail services (running on a VPS) from persistent mail storage (running on hardware you control at home). Mail arrives at the cloud relay, is immediately forwarded over an encrypted tunnel to your home device, and is never stored on the cloud.',
+      },
+      {
+        q: 'Why not just use Gmail / Outlook / ProtonMail?',
+        a: '<strong>Privacy:</strong> Gmail and Outlook read your mail for advertising and analysis. ProtonMail is better, but you\'re still trusting a third party.<br><br><strong>Control:</strong> No service can lock you out, change terms, or read your mail.<br><br><strong>Trade-off:</strong> DarkPipe requires technical skill to manage. If "docker compose up" sounds intimidating, stick with Gmail.',
+      },
+      {
+        q: 'How is this different from Mail-in-a-Box / Mailu / docker-mailserver?',
+        a: 'Those excellent projects run everything on a single VPS — meaning all your mail is stored on hardware you don\'t physically control. <strong>DarkPipe\'s key difference:</strong> Split architecture. The cloud relay is a pass-through gateway with no persistent storage. Your mail lives only on your home device.',
+      },
+      {
+        q: 'Will my emails go to spam?',
+        a: '<strong>Initially, yes — but this improves over time.</strong> New IP addresses have no sending reputation. IP warmup takes 4-6 weeks of gradually increasing send volume. DarkPipe automates SPF/DKIM/DMARC configuration, which are the technical prerequisites for good deliverability. Use <a href="https://www.mail-tester.com/" target="_blank" rel="noopener noreferrer">mail-tester.com</a> to check your score — aim for 9/10 or higher.',
+      },
+      {
+        q: 'How much does it cost?',
+        a: '<strong>$4-7/month ongoing.</strong> VPS: $3-6/month. Domain: ~$1/month. Home hardware: varies ($0 if you already own it, ~$100 one-time for a Raspberry Pi kit). Electricity: ~$1/month. Competitive with ProtonMail Plus ($4/month) and Fastmail ($5/month) — but requires your time to manage.',
+      },
+    ],
+  },
+  {
+    name: 'Setup & Deployment',
+    questions: [
+      {
+        q: 'What VPS provider should I use?',
+        a: '<strong>Recommended:</strong> Hetzner (best price/performance, EU-based, SMTP-friendly), Vultr (port 25 after account verification), OVH (SMTP-friendly, good EU presence).<br><br><strong>Avoid:</strong> DigitalOcean (blocks port 25, no exceptions), Google Cloud (blocks port 25), AWS EC2 (port 25 throttled).<br><br><strong>Key requirement:</strong> Port 25 must be open for SMTP.',
+      },
+      {
+        q: 'Can I run everything on one server?',
+        a: '<strong>No — and this is intentional.</strong> DarkPipe\'s security model requires separating the cloud relay from mail storage. Running everything on one server defeats the privacy purpose. You must have a cloud relay on a VPS (for SMTP deliverability) and a home device on your hardware (for mail storage and privacy).',
+      },
+      {
+        q: 'What home hardware do I need?',
+        a: '<strong>Minimum:</strong> Raspberry Pi 4 (4GB RAM recommended), 20GB SSD, Ethernet.<br><br><strong>Also supported:</strong> Any x64/arm64 system with Docker or Podman, TrueNAS Scale, Unraid, Synology, Proxmox LXC, Mac Silicon. See the platform guides for your system.',
+      },
+      {
+        q: 'Can I use Podman instead of Docker?',
+        a: '<strong>Yes, fully supported.</strong> DarkPipe works with Podman 5.3+ and podman-compose using provided override files. Cloud relay requires rootful Podman (port 25 binding). Home device can run rootless for additional security. SELinux-compatible volume labels included. Run <code>bash scripts/check-runtime.sh</code> to validate your setup.',
+      },
+    ],
+  },
+  {
+    name: 'Mail Servers',
+    questions: [
+      {
+        q: 'Which mail server should I choose?',
+        a: '<strong>Stalwart</strong> (recommended for most): Modern, Rust-based, all-in-one with IMAP4rev2, JMAP, built-in CalDAV/CardDAV, and web admin UI.<br><br><strong>Maddy:</strong> Minimal Go binary, suitable for 2GB RAM systems, requires Radicale for calendar/contacts.<br><br><strong>Postfix + Dovecot:</strong> Battle-tested with decades of production use, maximum community support, requires Radicale.<br><br>Can\'t decide? Start with Stalwart.',
+      },
+      {
+        q: 'Can I switch mail servers later?',
+        a: 'Yes, but it requires migrating mail data. Re-run the setup wizard, migrate mail via IMAP or maildir export/import, update DNS (DKIM keys change). It\'s possible but not trivial — choose carefully at the start.',
+      },
+      {
+        q: 'Does DarkPipe support POP3?',
+        a: '<strong>No.</strong> POP3 downloads mail to a single device and deletes from server. This is a security liability — if that device is lost, your mail is lost. IMAP is the modern standard (syncs across all devices). All DarkPipe mail servers support IMAP on port 993.',
+      },
+    ],
+  },
+  {
+    name: 'Security & Privacy',
+    questions: [
+      {
+        q: 'Is my email encrypted end-to-end?',
+        a: '<strong>Transport is encrypted. At-rest depends on your setup.</strong><br><br><strong>Encrypted:</strong> Internet to relay (Let\'s Encrypt TLS), relay to home (WireGuard or mTLS), home to mail clients (IMAPS/SMTPS), offline queue (age encryption). All containers run with dropped capabilities and read-only filesystems.<br><br><strong>Not encrypted by default:</strong> Mail storage on home device (enable full-disk encryption with LUKS or FileVault). For content encryption, use PGP/S/MIME in your mail client — DarkPipe doesn\'t prevent it.',
+      },
+      {
+        q: 'What happens if my VPS is compromised?',
+        a: 'An attacker <strong>can</strong> read mail in transit and decrypt the offline queue. An attacker <strong>cannot</strong> access stored mail on your home device or read historical mail. Mitigations: harden VPS (firewall, auto-updates, SSH keys only), monitor logs, use PGP/S/MIME for high-risk scenarios.',
+      },
+      {
+        q: 'What happens if my home device is offline?',
+        a: 'Mail queues encrypted (age encryption) on the cloud relay with a configurable timeout (default 7 days). S3-compatible overflow available for extended outages. Auto-drains when home device reconnects. Alternative: configure bounce-immediately behavior instead of queuing.',
+      },
+    ],
+  },
+  {
+    name: 'Operations',
+    questions: [
+      {
+        q: 'How do I add users and domains?',
+        a: '<strong>Stalwart:</strong> Web admin UI at port 8080.<br><strong>Maddy:</strong> Edit setup-users.sh, run maddyctl creds create, restart.<br><strong>Postfix+Dovecot:</strong> Edit vmailbox and users files, restart container.<br><br>All servers support aliases, multi-domain, and catch-all addresses.',
+      },
+      {
+        q: 'How do I back up my mail?',
+        a: 'Back up the mail data directory on your home device. Cloud relay has no mail to back up (by design). Methods: Docker volume backup with tar, ZFS/Btrfs snapshots, or rsync to external drive. Recommended: daily or weekly automated backups.',
+      },
+      {
+        q: 'How do I update DarkPipe?',
+        a: 'Pull new Docker images, update version tags in docker-compose.yml, restart services. Typically under 30 seconds of downtime. The setup wizard handles config migrations when needed — re-run with <code>--migrate-config</code> if prompted in release notes.',
+      },
+      {
+        q: 'How do I migrate from another email provider?',
+        a: 'Use the <code>darkpipe-setup migrate</code> CLI wizard. Supports Gmail, Outlook, Yahoo, iCloud, Fastmail, ProtonMail, Zoho, and generic IMAP. OAuth2 device flow for Gmail/Outlook. Dry-run mode previews before executing. Migration time: 30 minutes to 24+ hours depending on mailbox size.',
+      },
+    ],
+  },
+];
+---
+
+<Base title="FAQ" description="Frequently asked questions about DarkPipe — self-hosted email setup, security, mail servers, deployment, and operations.">
+  <!-- Page header -->
+  <section class="pt-32 pb-8 md:pt-40 md:pb-12" aria-labelledby="faq-heading">
+    <div class="mx-auto max-w-4xl px-6 text-center">
+      <h1 id="faq-heading" class="font-display text-3xl font-bold tracking-tight text-snow md:text-4xl lg:text-5xl">
+        Frequently Asked Questions
+      </h1>
+      <p class="mt-4 text-lg text-mist">
+        Common questions about DarkPipe, self-hosted email, setup, security, and operations.
+      </p>
+    </div>
+  </section>
+
+  <!-- FAQ categories -->
+  <section class="pb-16 md:pb-24" aria-label="FAQ categories">
+    <div class="mx-auto max-w-4xl px-6 space-y-10">
+      {categories.map((category) => (
+        <div>
+          <h2 class="font-display text-lg font-bold tracking-tight text-snow md:text-xl">
+            {category.name}
+          </h2>
+          <div class="mt-4 space-y-2">
+            {category.questions.map((item) => (
+              <details class="group rounded-xl border border-slate-mid/30 bg-abyss/40 transition-colors open:border-pipe/20 open:bg-abyss/60">
+                <summary class="flex cursor-pointer items-center justify-between gap-4 px-6 py-4 text-sm font-medium text-cloud transition-colors hover:text-snow [&::-webkit-details-marker]:hidden list-none">
+                  <span>{item.q}</span>
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    class="shrink-0 text-ghost transition-transform group-open:rotate-45"
+                    aria-hidden="true"
+                  >
+                    <path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                  </svg>
+                </summary>
+                <div class="px-6 pb-5 text-sm leading-relaxed text-mist [&_strong]:font-semibold [&_strong]:text-cloud [&_code]:rounded [&_code]:bg-slate-deep [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-xs [&_code]:text-cloud [&_a]:text-pipe [&_a:hover]:text-pipe-bright" set:html={item.a} />
+              </details>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Bottom CTA -->
+  <section class="border-t border-slate-mid/20 py-12 md:py-16">
+    <div class="mx-auto max-w-4xl px-6 text-center">
+      <h2 class="font-display text-xl font-bold tracking-tight text-snow md:text-2xl">
+        Still have questions?
+      </h2>
+      <p class="mt-2 text-mist">
+        Ask in
+        <a href="https://github.com/trek-e/darkpipe/discussions" class="text-pipe hover:text-pipe-bright" target="_blank" rel="noopener noreferrer">GitHub Discussions</a>
+        or
+        <a href="https://github.com/trek-e/darkpipe/issues" class="text-pipe hover:text-pipe-bright" target="_blank" rel="noopener noreferrer">open an issue</a>.
+      </p>
+    </div>
+  </section>
+</Base>

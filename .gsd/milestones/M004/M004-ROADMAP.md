@@ -56,11 +56,11 @@ This milestone is complete only when all are true:
 
 ## Slices
 
-- [ ] **S01: Astro Project & Hero Landing Page** `risk:high` `depends:[]`
+- [x] **S01: Astro Project & Hero Landing Page** `risk:high` `depends:[]`
   > After this: The Astro project is set up with Tailwind, the hero landing page renders locally with full visual treatment (value proposition, architecture diagram, feature highlights, CTAs), and the site has a shared layout with navigation and footer.
-- [ ] **S02: Features, Quickstart & FAQ Pages** `risk:medium` `depends:[S01]`
+- [x] **S02: Features, Quickstart & FAQ Pages** `risk:medium` `depends:[S01]`
   > After this: All 4 pages are complete — features page with detailed capability breakdowns, quickstart page sourced from repo docs, FAQ page with accurate answers. All pages share the layout from S01 and are navigable.
-- [ ] **S03: Polish, Accessibility & Deployment** `risk:low` `depends:[S02]`
+- [x] **S03: Polish, Accessibility & Deployment** `risk:low` `depends:[S02]`
   > After this: Site passes Lighthouse ≥90 on all categories, is WCAG AA compliant, responsive across breakpoints, deployed to Cloudflare Pages at darkpipe.org with HTTPS, and all links validated.
 
 ## Boundary Map

@@ -130,7 +130,7 @@ You can use the `deploy/test/vps-validate.sh` script (if available) to automate 
 
 ```bash
 # On your VPS
-curl -sSL https://raw.githubusercontent.com/yourusername/darkpipe/master/deploy/test/vps-validate.sh | bash
+curl -sSL https://raw.githubusercontent.com/yourusername/darkpipe/main/deploy/test/vps-validate.sh | bash
 ```
 
 (Note: This script will be added in a future phase.)

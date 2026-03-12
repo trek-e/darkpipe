@@ -109,7 +109,7 @@ WireGuard is simpler to set up and provides a full encrypted tunnel between clou
 apt install -y wireguard
 
 # Download setup script
-curl -LO https://raw.githubusercontent.com/trek-e/darkpipe/master/deploy/wireguard/cloud-setup.sh
+curl -LO https://raw.githubusercontent.com/trek-e/darkpipe/main/deploy/wireguard/cloud-setup.sh
 chmod +x cloud-setup.sh
 
 # Run setup (generates keys and config)
@@ -126,7 +126,7 @@ chmod +x cloud-setup.sh
 sudo apt install -y wireguard
 
 # Download setup script
-curl -LO https://raw.githubusercontent.com/trek-e/darkpipe/master/deploy/wireguard/home-setup.sh
+curl -LO https://raw.githubusercontent.com/trek-e/darkpipe/main/deploy/wireguard/home-setup.sh
 chmod +x home-setup.sh
 
 # Run setup with cloud relay's public key and endpoint
@@ -155,7 +155,7 @@ mTLS uses mutual TLS authentication without requiring a VPN. Suitable for minima
 **Set up internal PKI with step-ca:**
 ```bash
 # On home device (acts as CA)
-curl -LO https://github.com/trek-e/darkpipe/raw/master/deploy/pki/step-ca-setup.sh
+curl -LO https://github.com/trek-e/darkpipe/raw/main/deploy/pki/step-ca-setup.sh
 chmod +x step-ca-setup.sh
 ./step-ca-setup.sh
 

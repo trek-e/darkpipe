@@ -1,0 +1,137 @@
+---
+// Architecture diagram: Internet → Cloud Relay → Encrypted Tunnel → Home Device
+---
+
+<div class="relative mx-auto max-w-4xl" role="img" aria-label="DarkPipe architecture: Internet traffic reaches the Cloud Relay on a VPS, travels through an encrypted WireGuard or mTLS tunnel, and arrives at the Home Device where your mail server, webmail, and calendar run on your hardware. Mail is never stored on the cloud relay.">
+  <!-- Diagram container -->
+  <div class="rounded-2xl border border-slate-mid/50 bg-abyss/80 p-6 shadow-2xl backdrop-blur-sm md:p-10">
+    <!-- Title -->
+    <div class="mb-8 text-center">
+      <h2 class="font-display text-sm font-medium uppercase tracking-[0.2em] text-ghost">How DarkPipe Works</h2>
+    </div>
+
+    <!-- Flow diagram - responsive: stacks vertically on mobile -->
+    <div class="flex flex-col items-center gap-4 md:flex-row md:gap-0">
+
+      <!-- Internet -->
+      <div class="flex w-full flex-col items-center gap-2 md:w-1/5">
+        <div class="flex h-16 w-16 items-center justify-center rounded-xl border border-slate-mid/60 bg-slate-deep">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+            <circle cx="14" cy="14" r="11" stroke="var(--color-mist)" stroke-width="1.5" opacity="0.6" />
+            <ellipse cx="14" cy="14" rx="5" ry="11" stroke="var(--color-mist)" stroke-width="1.5" opacity="0.6" />
+            <path d="M3 14h22" stroke="var(--color-mist)" stroke-width="1.5" opacity="0.6" />
+            <path d="M5 8h18M5 20h18" stroke="var(--color-mist)" stroke-width="1" opacity="0.4" />
+          </svg>
+        </div>
+        <div class="text-center">
+          <p class="font-mono text-xs font-medium text-mist">Internet</p>
+          <p class="mt-0.5 text-[10px] text-ghost">SMTP / TLS</p>
+        </div>
+      </div>
+
+      <!-- Arrow 1 -->
+      <div class="flex items-center justify-center md:flex-1" aria-hidden="true">
+        <div class="flow-arrow hidden md:block">
+          <svg width="100%" height="24" viewBox="0 0 100 24" preserveAspectRatio="none">
+            <line x1="0" y1="12" x2="90" y2="12" stroke="var(--color-ghost)" stroke-width="1.5" stroke-dasharray="6 4" class="animate-dash" />
+            <polygon points="88,6 100,12 88,18" fill="var(--color-ghost)" />
+          </svg>
+        </div>
+        <div class="block md:hidden">
+          <svg width="24" height="40" viewBox="0 0 24 40" aria-hidden="true">
+            <line x1="12" y1="0" x2="12" y2="30" stroke="var(--color-ghost)" stroke-width="1.5" stroke-dasharray="6 4" />
+            <polygon points="6,28 12,40 18,28" fill="var(--color-ghost)" />
+          </svg>
+        </div>
+      </div>
+
+      <!-- Cloud Relay -->
+      <div class="flex w-full flex-col items-center gap-2 md:w-1/5">
+        <div class="relative flex h-16 w-16 items-center justify-center rounded-xl border border-pipe/30 bg-pipe/[0.08]">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+            <path d="M7 20h14a5 5 0 10-1-9.9A7 7 0 106 17" stroke="var(--color-pipe)" stroke-width="1.5" stroke-linecap="round" />
+            <path d="M11 16l3 3 3-3" stroke="var(--color-pipe)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.6" />
+          </svg>
+          <!-- "No storage" badge -->
+          <div class="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-alert/90 text-[8px] font-bold text-white" title="No mail stored">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+              <path d="M1 1l8 8M9 1L1 9" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+            </svg>
+          </div>
+        </div>
+        <div class="text-center">
+          <p class="font-mono text-xs font-medium text-pipe">Cloud Relay</p>
+          <p class="mt-0.5 text-[10px] text-ghost">VPS · Pass-through only</p>
+        </div>
+      </div>
+
+      <!-- Arrow 2 (encrypted tunnel) -->
+      <div class="flex flex-col items-center justify-center md:flex-1" aria-hidden="true">
+        <div class="hidden md:block md:w-full">
+          <svg width="100%" height="32" viewBox="0 0 100 32" preserveAspectRatio="none">
+            <!-- Tunnel tube -->
+            <rect x="5" y="6" width="85" height="20" rx="10" fill="none" stroke="var(--color-pipe)" stroke-width="1" opacity="0.3" />
+            <!-- Flow line -->
+            <line x1="10" y1="16" x2="85" y2="16" stroke="var(--color-pipe)" stroke-width="2" stroke-dasharray="6 4" class="animate-dash" />
+            <polygon points="83,10 95,16 83,22" fill="var(--color-pipe)" opacity="0.8" />
+          </svg>
+        </div>
+        <div class="block md:hidden">
+          <svg width="32" height="48" viewBox="0 0 32 48" aria-hidden="true">
+            <rect x="6" y="4" width="20" height="36" rx="10" fill="none" stroke="var(--color-pipe)" stroke-width="1" opacity="0.3" />
+            <line x1="16" y1="8" x2="16" y2="38" stroke="var(--color-pipe)" stroke-width="2" stroke-dasharray="6 4" />
+            <polygon points="10,36 16,48 22,36" fill="var(--color-pipe)" opacity="0.8" />
+          </svg>
+        </div>
+        <span class="mt-1 rounded-full border border-pipe/20 bg-pipe/[0.06] px-2.5 py-0.5 font-mono text-[10px] font-medium text-pipe">
+          WireGuard / mTLS
+        </span>
+      </div>
+
+      <!-- Home Device -->
+      <div class="flex w-full flex-col items-center gap-2 md:w-1/5">
+        <div class="flex h-16 w-16 items-center justify-center rounded-xl border border-pipe/30 bg-pipe/[0.08]">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+            <rect x="4" y="6" width="20" height="14" rx="2" stroke="var(--color-pipe-bright)" stroke-width="1.5" />
+            <path d="M10 24h8M14 20v4" stroke="var(--color-pipe-bright)" stroke-width="1.5" stroke-linecap="round" />
+            <!-- Lock icon -->
+            <rect x="11" y="10" width="6" height="5" rx="1" stroke="var(--color-pipe-bright)" stroke-width="1" />
+            <path d="M12.5 10V8.5a1.5 1.5 0 013 0V10" stroke="var(--color-pipe-bright)" stroke-width="1" stroke-linecap="round" />
+          </svg>
+        </div>
+        <div class="text-center">
+          <p class="font-mono text-xs font-medium text-pipe-bright">Home Device</p>
+          <p class="mt-0.5 text-[10px] text-ghost">Your hardware · Your mail</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Component labels below -->
+    <div class="mt-8 grid grid-cols-1 gap-3 border-t border-slate-mid/30 pt-6 md:grid-cols-3">
+      <div class="rounded-lg border border-slate-mid/30 bg-slate-deep/50 px-4 py-3">
+        <p class="font-mono text-[10px] font-medium uppercase tracking-wider text-ghost">Cloud Relay</p>
+        <p class="mt-1 text-xs text-mist">Postfix MTA · Certbot TLS · Rspamd · Monitoring</p>
+      </div>
+      <div class="rounded-lg border border-pipe/10 bg-pipe/[0.03] px-4 py-3">
+        <p class="font-mono text-[10px] font-medium uppercase tracking-wider text-pipe-dim">Encrypted Transport</p>
+        <p class="mt-1 text-xs text-mist">WireGuard tunnel or mTLS · Zero-knowledge relay</p>
+      </div>
+      <div class="rounded-lg border border-slate-mid/30 bg-slate-deep/50 px-4 py-3">
+        <p class="font-mono text-[10px] font-medium uppercase tracking-wider text-ghost">Home Device</p>
+        <p class="mt-1 text-xs text-mist">Stalwart / Maddy / Postfix+Dovecot · Webmail · Calendar</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .animate-dash {
+    animation: dash-flow 1.5s linear infinite;
+  }
+
+  @keyframes dash-flow {
+    to {
+      stroke-dashoffset: -20;
+    }
+  }
+</style>

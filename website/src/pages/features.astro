@@ -1,0 +1,213 @@
+---
+import Base from '../layouts/Base.astro';
+
+const mailServers = [
+  {
+    name: 'Stalwart',
+    tag: 'Recommended',
+    description: 'Modern, written in Rust. All-in-one: IMAP4rev2, JMAP, SMTP, built-in CalDAV/CardDAV, and web admin UI. Best for most users who want a feature-rich, low-maintenance server.',
+    highlights: ['JMAP support', 'Built-in CalDAV/CardDAV', 'Web admin UI', 'Memory-safe (Rust)'],
+  },
+  {
+    name: 'Maddy',
+    tag: 'Minimal',
+    description: 'Single Go binary with minimal dependencies. Ideal for low-resource systems (2GB RAM). Requires Radicale for calendar/contacts.',
+    highlights: ['Single binary', '~256MB RAM', 'Go-based', 'Minimal footprint'],
+  },
+  {
+    name: 'Postfix + Dovecot',
+    tag: 'Battle-tested',
+    description: 'Decades of production use. Separate MTA (Postfix) and IMAP server (Dovecot). Maximum community support and documentation. Requires Radicale for calendar/contacts.',
+    highlights: ['Proven reliability', 'Extensive docs', 'Community support', 'Traditional stack'],
+  },
+];
+
+const features = [
+  {
+    category: 'Transport & Security',
+    items: [
+      {
+        title: 'Encrypted Transport',
+        description: 'Choose WireGuard (full encrypted tunnel, recommended) or mTLS (mutual TLS, minimal footprint). Mail moves encrypted between cloud relay and home device. The relay is zero-knowledge — it forwards, never stores.',
+      },
+      {
+        title: 'TLS Everywhere',
+        description: 'Let\'s Encrypt on the cloud relay for internet-facing TLS. step-ca internal PKI for transport certificates. Configurable certificate rotation at 30, 60, or 90 day intervals. Certificate expiry alerts built in.',
+      },
+      {
+        title: 'DNS Authentication',
+        description: 'Automated SPF, DKIM, and DMARC configuration with the dns-setup CLI. Supports Cloudflare and Route53 API integration, or manual setup with generated records. Dry-run by default — requires explicit --apply.',
+      },
+    ],
+  },
+  {
+    category: 'Reliability',
+    items: [
+      {
+        title: 'Encrypted Offline Queuing',
+        description: 'Home device goes offline? Mail queues encrypted (age encryption) on the relay with configurable timeout (default 7 days). S3-compatible overflow to Storj, AWS S3, or MinIO when local queue exceeds threshold. Auto-drains on reconnect.',
+      },
+      {
+        title: 'Configurable Queue Behavior',
+        description: 'Choose queue-or-bounce: queue mail encrypted when home is unreachable, or bounce immediately. 200MB RAM limit, 10K message limit, rate-limited drain at 10 messages/tick to prevent thundering herd.',
+      },
+      {
+        title: 'Health Monitoring',
+        description: 'Web-based monitoring dashboard with mail queue status, service health, certificate expiry dates, and delivery logs. Alerts via email, webhooks (Slack/Discord), or Healthcheck.io integration.',
+      },
+    ],
+  },
+  {
+    category: 'User Experience',
+    items: [
+      {
+        title: 'Device Onboarding',
+        description: 'Apple .mobileconfig profiles for one-tap iOS/macOS setup (Email + CalDAV + CardDAV in one profile). QR codes for Android. Thunderbird and Outlook autodiscovery. App-generated passwords for enhanced security.',
+      },
+      {
+        title: 'Webmail Options',
+        description: 'Roundcube (feature-rich, mobile-responsive Elastic skin) or SnappyMail (modern, fast, lightweight). IMAP passthrough authentication — no separate webmail database. 60-minute sessions with auto-refresh.',
+      },
+      {
+        title: 'Calendar & Contacts',
+        description: 'Stalwart includes built-in CalDAV/CardDAV. Maddy and Postfix+Dovecot use Radicale with file-based storage. Shared family calendars and address books. Well-known URL auto-discovery.',
+      },
+    ],
+  },
+  {
+    category: 'Operations',
+    items: [
+      {
+        title: 'Migration Tools',
+        description: 'CLI wizard migrates from Gmail, Outlook, Yahoo, iCloud, Fastmail, ProtonMail, or Zoho. OAuth2 device flow for Gmail/Outlook (no browser redirect). Dry-run mode previews before executing. Handles large mailboxes.',
+      },
+      {
+        title: 'Spam Filtering',
+        description: 'Rspamd with greylisting (5-minute delay, score threshold ≥ 4.0). SPF/DKIM/DMARC validation. Conservative thresholds: reject=15, header=6, greylist=4. Private network whitelist prevents greylisting relayed mail. Authenticated submission bypasses filters.',
+      },
+      {
+        title: 'Multi-User & Multi-Domain',
+        description: 'Virtual mailbox domains with aliases, catch-all addresses, and user isolation by maildir path. Add users and domains via web UI (Stalwart), config files (Maddy), or virtual maps (Postfix+Dovecot).',
+      },
+    ],
+  },
+  {
+    category: 'Platform Support',
+    items: [
+      {
+        title: 'Multi-Architecture',
+        description: 'All components build and run on arm64 and x64. GitHub Actions multi-arch build pipeline with component selection. Pre-built Docker images for common stack configurations. Cloud relay container ~35MB.',
+      },
+      {
+        title: 'Runtime Flexibility',
+        description: 'Docker, Podman 5.3+ (rootful for cloud relay, rootless for home device), and Apple Containers on macOS. Override files for Podman — no base compose forks. SELinux-compatible volume labels. Runtime validation script included.',
+      },
+      {
+        title: 'Platform Guides',
+        description: 'Deployment guides for Raspberry Pi 4+, TrueNAS Scale, Unraid Community Applications, Proxmox LXC, Synology Container Manager, and generic Docker/Podman hosts. Memory optimization for constrained systems.',
+      },
+    ],
+  },
+];
+---
+
+<Base title="Features" description="DarkPipe features: choose your mail server, encrypted transport, offline queuing, spam filtering, device onboarding, and migration tools.">
+  <!-- Page header -->
+  <section class="pt-32 pb-12 md:pt-40 md:pb-16" aria-labelledby="features-heading">
+    <div class="mx-auto max-w-6xl px-6">
+      <div class="mx-auto max-w-3xl text-center">
+        <h1 id="features-heading" class="font-display text-3xl font-bold tracking-tight text-snow md:text-4xl lg:text-5xl">
+          Built for email sovereignty
+        </h1>
+        <p class="mt-4 text-lg text-mist">
+          Every component is open source, runs on your hardware, and designed for privacy-first email infrastructure.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Mail server comparison -->
+  <section class="py-12 md:py-16" aria-labelledby="mail-servers-heading">
+    <div class="mx-auto max-w-6xl px-6">
+      <h2 id="mail-servers-heading" class="font-display text-xl font-bold tracking-tight text-snow md:text-2xl">
+        Choose your mail server
+      </h2>
+      <p class="mt-2 text-mist">
+        Three options, each with different trade-offs. Switch later if your needs change.
+      </p>
+
+      <div class="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3">
+        {mailServers.map((server) => (
+          <div class="rounded-xl border border-slate-mid/40 bg-abyss/60 p-6">
+            <div class="flex items-center gap-3">
+              <h3 class="font-display text-lg font-bold text-snow">{server.name}</h3>
+              <span class:list={[
+                'rounded-full px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-wider',
+                server.tag === 'Recommended' ? 'bg-pipe/10 text-pipe border border-pipe/20' : 'bg-slate-mid/40 text-ghost border border-slate-mid/30',
+              ]}>
+                {server.tag}
+              </span>
+            </div>
+            <p class="mt-3 text-sm leading-relaxed text-mist">{server.description}</p>
+            <ul class="mt-4 flex flex-wrap gap-2" role="list">
+              {server.highlights.map((h) => (
+                <li class="rounded-md bg-slate-deep px-2.5 py-1 text-xs text-ghost">{h}</li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Feature categories -->
+  {features.map((category) => (
+    <section class="border-t border-slate-mid/20 py-12 md:py-16" aria-labelledby={`cat-${category.category.toLowerCase().replace(/[^a-z]/g, '-')}`}>
+      <div class="mx-auto max-w-6xl px-6">
+        <h2 id={`cat-${category.category.toLowerCase().replace(/[^a-z]/g, '-')}`} class="font-display text-xl font-bold tracking-tight text-snow md:text-2xl">
+          {category.category}
+        </h2>
+
+        <div class="mt-8 grid grid-cols-1 gap-6 md:grid-cols-3">
+          {category.items.map((item) => (
+            <div class="rounded-xl border border-slate-mid/30 bg-abyss/40 p-6">
+              <h3 class="font-display text-sm font-bold tracking-tight text-snow">{item.title}</h3>
+              <p class="mt-2 text-sm leading-relaxed text-mist">{item.description}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  ))}
+
+  <!-- CTA -->
+  <section class="border-t border-slate-mid/20 py-16 md:py-20">
+    <div class="mx-auto max-w-6xl px-6 text-center">
+      <h2 class="font-display text-2xl font-bold tracking-tight text-snow md:text-3xl">
+        Ready to take back your email?
+      </h2>
+      <p class="mt-3 text-mist">
+        30-60 minutes from zero to sending and receiving on your own hardware.
+      </p>
+      <div class="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+        <a
+          href="/quickstart"
+          class="inline-flex items-center gap-2 rounded-lg bg-pipe px-6 py-3.5 text-sm font-semibold text-void shadow-lg shadow-pipe/20 transition-all hover:bg-pipe-bright hover:shadow-pipe/30"
+        >
+          Get Started
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </a>
+        <a
+          href="https://github.com/trek-e/darkpipe"
+          class="inline-flex items-center gap-2 rounded-lg border border-slate-mid bg-slate-deep/50 px-6 py-3.5 text-sm font-semibold text-cloud transition-all hover:border-slate-light hover:bg-slate-mid/50"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          View Source on GitHub
+        </a>
+      </div>
+    </div>
+  </section>
+</Base>

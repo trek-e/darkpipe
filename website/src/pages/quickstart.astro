@@ -1,0 +1,299 @@
+---
+import Base from '../layouts/Base.astro';
+
+const steps = [
+  {
+    number: 1,
+    title: 'Provision Your Cloud Relay',
+    content: `
+      <p>You need a VPS with <strong>port 25 open</strong> for SMTP. Most cloud providers block it — choose one that doesn't.</p>
+      <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div class="rounded-lg border border-pipe/10 bg-pipe/[0.03] p-4">
+          <p class="text-xs font-medium uppercase tracking-wider text-pipe-dim">Recommended</p>
+          <p class="mt-1 text-sm text-cloud"><strong>Hetzner</strong> — No restrictions, great price/performance, EU-based</p>
+          <p class="mt-1 text-sm text-cloud"><strong>Vultr</strong> — Port 25 after account verification</p>
+        </div>
+        <div class="rounded-lg border border-alert/10 bg-alert/[0.03] p-4">
+          <p class="text-xs font-medium uppercase tracking-wider text-alert/70">Avoid</p>
+          <p class="mt-1 text-sm text-mist">DigitalOcean, Google Cloud, AWS EC2 (port 25 blocked)</p>
+        </div>
+      </div>
+      <p class="mt-4 text-sm text-mist"><strong>Minimum specs:</strong> 1 vCPU, 1GB RAM, 20GB SSD ($3-6/month). Set hostname to <code>relay.yourdomain.com</code>, configure reverse DNS (PTR record), and install Docker.</p>
+      <div class="mt-3">
+        <pre class="overflow-x-auto rounded-lg border border-slate-mid/30 bg-slate-deep p-4 font-mono text-xs text-cloud"><code># Set hostname
+hostnamectl set-hostname relay.yourdomain.com
+
+# Update system
+apt update && apt upgrade -y
+
+# Install Docker
+curl -fsSL https://get.docker.com | sh
+
+# Verify port 25 is open
+telnet gmail-smtp-in.l.google.com 25</code></pre>
+      </div>
+      <p class="mt-3 text-xs text-ghost"><strong>Podman users:</strong> Install Podman 5.3+ and podman-compose instead of Docker. See the <a href="https://github.com/trek-e/darkpipe/blob/main/deploy/platform-guides/podman.md" class="text-pipe hover:text-pipe-bright" target="_blank" rel="noopener noreferrer">Podman platform guide</a>.</p>
+    `,
+  },
+  {
+    number: 2,
+    title: 'Set Up Transport Layer',
+    content: `
+      <p>Choose an encrypted transport between your cloud relay and home device:</p>
+      <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div class="rounded-lg border border-pipe/20 bg-pipe/[0.04] p-4">
+          <p class="font-mono text-xs font-medium text-pipe">WireGuard <span class="text-ghost">(Recommended)</span></p>
+          <p class="mt-2 text-sm text-mist">Full encrypted tunnel. Simpler setup, widely supported. Uses UDP port 51820.</p>
+        </div>
+        <div class="rounded-lg border border-slate-mid/30 bg-slate-deep p-4">
+          <p class="font-mono text-xs font-medium text-cloud">mTLS</p>
+          <p class="mt-2 text-sm text-mist">Mutual TLS authentication. No VPN needed, minimal footprint. Uses step-ca for internal PKI.</p>
+        </div>
+      </div>
+      <div class="mt-4">
+        <p class="mb-2 text-xs font-medium uppercase tracking-wider text-ghost">WireGuard setup</p>
+        <pre class="overflow-x-auto rounded-lg border border-slate-mid/30 bg-slate-deep p-4 font-mono text-xs text-cloud"><code># On cloud relay VPS
+apt install -y wireguard
+curl -LO https://raw.githubusercontent.com/trek-e/darkpipe/main/deploy/wireguard/cloud-setup.sh
+chmod +x cloud-setup.sh && ./cloud-setup.sh
+
+# On home device
+sudo apt install -y wireguard
+curl -LO https://raw.githubusercontent.com/trek-e/darkpipe/main/deploy/wireguard/home-setup.sh
+chmod +x home-setup.sh
+./home-setup.sh --cloud-endpoint YOUR_VPS_IP:51820 --cloud-pubkey CLOUD_PUBLIC_KEY
+sudo wg-quick up wg0 && sudo systemctl enable wg-quick@wg0
+
+# Verify: ping 10.8.0.2 from cloud relay</code></pre>
+      </div>
+    `,
+  },
+  {
+    number: 3,
+    title: 'Run the Setup Wizard',
+    content: `
+      <p>The <code>darkpipe-setup</code> wizard generates configuration for both cloud relay and home device.</p>
+      <div class="mt-3">
+        <pre class="overflow-x-auto rounded-lg border border-slate-mid/30 bg-slate-deep p-4 font-mono text-xs text-cloud"><code># Download for your platform
+curl -LO https://github.com/trek-e/darkpipe/releases/latest/download/darkpipe-setup-linux-amd64
+chmod +x darkpipe-setup-linux-amd64
+
+# Run the wizard
+./darkpipe-setup-linux-amd64</code></pre>
+      </div>
+      <p class="mt-3 text-sm text-mist">The wizard asks for your domain, relay hostname, mail server choice (Stalwart/Maddy/Postfix+Dovecot), webmail preference, transport type, and admin credentials. It generates <code>.env</code> and <code>docker-compose.yml</code> for both deployments.</p>
+      <p class="mt-2 text-sm text-mist">Available for Linux amd64/arm64 and macOS Intel/Apple Silicon. See <code>.env.example</code> files for all configurable variables.</p>
+    `,
+  },
+  {
+    number: 4,
+    title: 'Configure DNS',
+    content: `
+      <p>Email requires SPF, DKIM, and DMARC records. The <code>dns-setup</code> tool automates this.</p>
+      <div class="mt-3">
+        <pre class="overflow-x-auto rounded-lg border border-slate-mid/30 bg-slate-deep p-4 font-mono text-xs text-cloud"><code># Preview changes (dry-run by default)
+./dns-setup-linux-amd64 \\
+  --domain example.com \\
+  --relay-hostname relay.example.com \\
+  --relay-ip YOUR_VPS_IP
+
+# Apply with Cloudflare API
+export CLOUDFLARE_API_TOKEN=your_token
+./dns-setup-linux-amd64 \\
+  --domain example.com \\
+  --relay-hostname relay.example.com \\
+  --relay-ip YOUR_VPS_IP \\
+  --provider cloudflare --apply
+
+# Validate after DNS propagation (5-60 min)
+./dns-setup-linux-amd64 --domain example.com --validate-only</code></pre>
+      </div>
+      <p class="mt-3 text-sm text-mist">Supports Cloudflare and Route53 API automation, or manual setup via your DNS provider's control panel. Records created: MX, A, SPF, DKIM, DMARC.</p>
+    `,
+  },
+  {
+    number: 5,
+    title: 'Deploy Services',
+    content: `
+      <p>Start the cloud relay on your VPS and the home device stack on your hardware.</p>
+      <div class="mt-3 grid grid-cols-1 gap-3 lg:grid-cols-2">
+        <div>
+          <p class="mb-2 text-xs font-medium uppercase tracking-wider text-ghost">Cloud Relay (VPS)</p>
+          <pre class="overflow-x-auto rounded-lg border border-slate-mid/30 bg-slate-deep p-4 font-mono text-xs text-cloud"><code>cd cloud-relay
+docker compose up -d
+docker compose ps
+docker compose logs -f</code></pre>
+        </div>
+        <div>
+          <p class="mb-2 text-xs font-medium uppercase tracking-wider text-ghost">Home Device</p>
+          <pre class="overflow-x-auto rounded-lg border border-slate-mid/30 bg-slate-deep p-4 font-mono text-xs text-cloud"><code>cd home-device
+
+# Stalwart + SnappyMail
+docker compose --profile stalwart \\
+  --profile snappymail up -d
+
+# Or Postfix+Dovecot + Roundcube + Radicale
+docker compose --profile postfix-dovecot \\
+  --profile roundcube \\
+  --profile radicale up -d</code></pre>
+        </div>
+      </div>
+      <p class="mt-3 text-xs text-ghost"><strong>Podman:</strong> Add <code>-f docker-compose.podman.yml</code> after the base compose file. Cloud relay requires rootful Podman; home device supports rootless.</p>
+    `,
+  },
+  {
+    number: 6,
+    title: 'Test Email Delivery',
+    content: `
+      <p>Send a test email from an external account (Gmail, Outlook, etc.) to <code>admin@yourdomain.com</code>.</p>
+      <ol class="mt-3 space-y-2 text-sm text-mist">
+        <li class="flex gap-2"><span class="font-mono text-pipe">1.</span> Access webmail at <code>https://mail.yourdomain.com</code></li>
+        <li class="flex gap-2"><span class="font-mono text-pipe">2.</span> Log in with your admin credentials</li>
+        <li class="flex gap-2"><span class="font-mono text-pipe">3.</span> Check inbox for the test message</li>
+        <li class="flex gap-2"><span class="font-mono text-pipe">4.</span> Send a reply back to test outbound delivery</li>
+        <li class="flex gap-2"><span class="font-mono text-pipe">5.</span> Forward to <code>check-auth@verifier.port25.com</code> to verify SPF/DKIM/DMARC</li>
+      </ol>
+      <p class="mt-3 text-xs text-ghost">New IPs have no reputation — mail may land in spam initially. This improves over 4-6 weeks of IP warmup.</p>
+    `,
+  },
+  {
+    number: 7,
+    title: 'Onboard Devices',
+    content: `
+      <p>Configure mail on all your devices via the profile server at <code>http://HOME_IP:8090</code>.</p>
+      <div class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div class="rounded-lg border border-slate-mid/30 bg-slate-deep p-4">
+          <p class="font-mono text-xs font-medium text-cloud">iOS / macOS</p>
+          <p class="mt-2 text-xs text-mist">Download .mobileconfig profile — configures IMAP, SMTP, CalDAV, and CardDAV in one tap.</p>
+        </div>
+        <div class="rounded-lg border border-slate-mid/30 bg-slate-deep p-4">
+          <p class="font-mono text-xs font-medium text-cloud">Android</p>
+          <p class="mt-2 text-xs text-mist">Scan QR code with your mail app (K-9 Mail, FairEmail, Gmail app).</p>
+        </div>
+        <div class="rounded-lg border border-slate-mid/30 bg-slate-deep p-4">
+          <p class="font-mono text-xs font-medium text-cloud">Desktop</p>
+          <p class="mt-2 text-xs text-mist">Thunderbird and Outlook use autodiscovery. Manual config: IMAP 993, SMTP 587.</p>
+        </div>
+      </div>
+      <p class="mt-3 text-sm text-mist">Generate <strong>app-specific passwords</strong> for individual devices via the profile server for enhanced security.</p>
+    `,
+  },
+  {
+    number: 8,
+    title: 'Monitor & Maintain',
+    content: `
+      <p>Access the monitoring dashboard at <code>http://HOME_IP:8090/monitoring</code> for queue status, service health, certificate expiry, and delivery logs.</p>
+      <div class="mt-3">
+        <pre class="overflow-x-auto rounded-lg border border-slate-mid/30 bg-slate-deep p-4 font-mono text-xs text-cloud"><code># Configure alerts in home-device/.env
+MONITOR_ALERT_EMAIL=personal@gmail.com
+MONITOR_WEBHOOK_URL=https://hooks.slack.com/...
+MONITOR_HEALTHCHECK_URL=https://hc-ping.com/...
+
+# IP warmup (4-6 weeks)
+# Week 1: 10-20 emails/day
+# Week 2: 50-100 emails/day
+# Week 3: 200-500 emails/day
+# Week 4-6: Normal volume</code></pre>
+      </div>
+      <p class="mt-3 text-sm text-mist">Logs redact email addresses by default. Enable <code>RELAY_DEBUG=true</code> for full PII during troubleshooting (disable after).</p>
+    `,
+  },
+];
+---
+
+<Base title="Quickstart" description="Deploy DarkPipe from zero to sending and receiving email in 30-60 minutes. Step-by-step guide for cloud relay, transport, DNS, and mail server setup.">
+  <!-- Page header -->
+  <section class="pt-32 pb-8 md:pt-40 md:pb-12" aria-labelledby="quickstart-heading">
+    <div class="mx-auto max-w-4xl px-6">
+      <div class="text-center">
+        <h1 id="quickstart-heading" class="font-display text-3xl font-bold tracking-tight text-snow md:text-4xl lg:text-5xl">
+          Quick Start Guide
+        </h1>
+        <p class="mt-4 text-lg text-mist">
+          From zero to sending and receiving email on your own hardware.
+        </p>
+        <div class="mt-4 flex flex-wrap items-center justify-center gap-4 text-sm text-ghost">
+          <span class="flex items-center gap-1.5">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <circle cx="7" cy="7" r="6" stroke="var(--color-ghost)" stroke-width="1" />
+              <path d="M7 4v3l2 1.5" stroke="var(--color-ghost)" stroke-width="1" stroke-linecap="round" />
+            </svg>
+            30-60 minutes setup
+          </span>
+          <span class="flex items-center gap-1.5">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <path d="M3 7l3 3 5-5" stroke="var(--color-ghost)" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            8 steps
+          </span>
+          <span class="flex items-center gap-1.5">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <rect x="2" y="4" width="10" height="7" rx="1" stroke="var(--color-ghost)" stroke-width="1" />
+              <path d="M2 6l5 3 5-3" stroke="var(--color-ghost)" stroke-width="1" />
+            </svg>
+            4-6 weeks warmup
+          </span>
+        </div>
+      </div>
+
+      <!-- Prerequisites -->
+      <div class="mt-12 rounded-xl border border-slate-mid/40 bg-abyss/60 p-6">
+        <h2 class="font-display text-sm font-bold uppercase tracking-wider text-ghost">Prerequisites</h2>
+        <ul class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2" role="list">
+          <li class="flex gap-3 text-sm text-mist">
+            <span class="mt-0.5 text-pipe" aria-hidden="true">→</span>
+            <span>A <strong class="text-cloud">domain name</strong> you control (DNS API or manual access)</span>
+          </li>
+          <li class="flex gap-3 text-sm text-mist">
+            <span class="mt-0.5 text-pipe" aria-hidden="true">→</span>
+            <span>A <strong class="text-cloud">VPS with port 25</strong> ($3-6/month — Hetzner, Vultr, OVH)</span>
+          </li>
+          <li class="flex gap-3 text-sm text-mist">
+            <span class="mt-0.5 text-pipe" aria-hidden="true">→</span>
+            <span>A <strong class="text-cloud">home device</strong> running Docker or Podman (RPi 4+, NAS, Linux PC)</span>
+          </li>
+          <li class="flex gap-3 text-sm text-mist">
+            <span class="mt-0.5 text-pipe" aria-hidden="true">→</span>
+            <span><strong class="text-cloud">30-60 minutes</strong> for initial setup + patience for IP warmup</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Steps -->
+  <section class="pb-16 md:pb-24" aria-label="Setup steps">
+    <div class="mx-auto max-w-4xl px-6">
+      <ol class="relative space-y-8 border-l border-slate-mid/30 pl-8 md:pl-10" role="list">
+        {steps.map((step) => (
+          <li class="relative">
+            <!-- Step number -->
+            <div class="absolute -left-12 flex h-8 w-8 items-center justify-center rounded-full border border-slate-mid/50 bg-abyss font-mono text-xs font-bold text-pipe md:-left-[3.25rem]" aria-hidden="true">
+              {step.number}
+            </div>
+
+            <div class="rounded-xl border border-slate-mid/30 bg-abyss/40 p-6">
+              <h2 class="font-display text-lg font-bold tracking-tight text-snow">
+                <span class="sr-only">Step {step.number}: </span>{step.title}
+              </h2>
+              <div class="mt-3 text-sm leading-relaxed text-mist [&_code]:rounded [&_code]:bg-slate-deep [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-xs [&_code]:text-cloud [&_strong]:font-semibold [&_strong]:text-cloud [&_a]:text-pipe [&_a:hover]:text-pipe-bright" set:html={step.content} />
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <!-- Bottom CTA -->
+  <section class="border-t border-slate-mid/20 py-12 md:py-16">
+    <div class="mx-auto max-w-4xl px-6 text-center">
+      <h2 class="font-display text-xl font-bold tracking-tight text-snow md:text-2xl">
+        Need help?
+      </h2>
+      <p class="mt-2 text-mist">
+        Check the <a href="/faq" class="text-pipe hover:text-pipe-bright">FAQ</a> or ask in
+        <a href="https://github.com/trek-e/darkpipe/discussions" class="text-pipe hover:text-pipe-bright" target="_blank" rel="noopener noreferrer">GitHub Discussions</a>.
+      </p>
+    </div>
+  </section>
+</Base>
