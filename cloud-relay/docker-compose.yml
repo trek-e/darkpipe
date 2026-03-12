@@ -24,6 +24,7 @@ services:
       - caddy-config:/config    # Caddy config cache
       - caddy-logs:/var/log/caddy
     environment:
+      HOME_DEVICE_IP: ${HOME_DEVICE_IP:-10.8.0.2}
       WEBMAIL_DOMAINS: mail.${RELAY_DOMAIN:-example.com}
       AUTOCONFIG_DOMAINS: autoconfig.${RELAY_DOMAIN:-example.com}
       AUTODISCOVER_DOMAINS: autodiscover.${RELAY_DOMAIN:-example.com}

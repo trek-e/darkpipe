@@ -1,7 +1,7 @@
 # GSD State
 
 **Active Milestone:** M005 — Design Validation — External Access & Device Connectivity
-**Active Slice:** S01 — Infrastructure Validation — DNS, TLS & Tunnel
+**Active Slice:** S02 — Email Round-Trip — Inbound & Outbound Delivery
 **Phase:** planning
 **Requirements Status:** 0 active · 0 validated · 0 deferred · 0 out of scope
 
@@ -19,4 +19,4 @@
 - None
 
 ## Next Action
-Plan slice S01 (Infrastructure Validation — DNS, TLS & Tunnel).
+Plan slice S02 (Email Round-Trip — Inbound & Outbound Delivery).

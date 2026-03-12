@@ -56,7 +56,7 @@ This milestone is complete only when all are true:
 
 ## Slices
 
-- [ ] **S01: Infrastructure Validation — DNS, TLS & Tunnel** `risk:high` `depends:[]`
+- [x] **S01: Infrastructure Validation — DNS, TLS & Tunnel** `risk:high` `depends:[]`
   > After this: DNS records validate from external resolvers, TLS certificates are trusted, WireGuard/mTLS tunnel is stable between cloud relay and home device, and all required ports (25, 587, 993, 443) respond from the public internet.
 
 - [ ] **S02: Email Round-Trip — Inbound & Outbound Delivery** `risk:high` `depends:[S01]`

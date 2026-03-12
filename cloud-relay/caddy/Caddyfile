@@ -15,7 +15,7 @@
 	# CalDAV/CardDAV reverse proxy to home device Radicale
 	# Note: Remove this block when using Stalwart (built-in CalDAV/CardDAV on port 8080)
 	handle_path /radicale/* {
-		reverse_proxy 10.0.0.2:5232 {
+		reverse_proxy {$HOME_DEVICE_IP}:5232 {
 			header_up Host {host}
 			header_up X-Real-IP {remote_host}
 			header_up X-Forwarded-For {remote_host}
@@ -25,22 +25,22 @@
 
 	# Mozilla Thunderbird autoconfig (well-known path)
 	handle /.well-known/autoconfig/mail/config-v1.1.xml {
-		reverse_proxy 10.0.0.2:8090
+		reverse_proxy {$HOME_DEVICE_IP}:8090
 	}
 
 	# Microsoft Outlook autodiscover
 	handle /autodiscover/autodiscover.xml {
-		reverse_proxy 10.0.0.2:8090
+		reverse_proxy {$HOME_DEVICE_IP}:8090
 	}
 
 	# Profile download (QR code token redemption)
 	handle /profile/* {
-		reverse_proxy 10.0.0.2:8090
+		reverse_proxy {$HOME_DEVICE_IP}:8090
 	}
 
 	# QR code generation (authenticated, for webmail iframe)
 	handle /qr/* {
-		reverse_proxy 10.0.0.2:8090
+		reverse_proxy {$HOME_DEVICE_IP}:8090
 	}
 
 	# Monitoring dashboard and health endpoints (Basic Auth required)
@@ -48,25 +48,25 @@
 		basicauth {
 			{$ADMIN_USER} {$ADMIN_PASSWORD_HASH}
 		}
-		reverse_proxy 10.0.0.2:8090
+		reverse_proxy {$HOME_DEVICE_IP}:8090
 	}
 
 	handle /status {
 		basicauth {
 			{$ADMIN_USER} {$ADMIN_PASSWORD_HASH}
 		}
-		reverse_proxy 10.0.0.2:8090
+		reverse_proxy {$HOME_DEVICE_IP}:8090
 	}
 
 	handle /status/* {
 		basicauth {
 			{$ADMIN_USER} {$ADMIN_PASSWORD_HASH}
 		}
-		reverse_proxy 10.0.0.2:8090
+		reverse_proxy {$HOME_DEVICE_IP}:8090
 	}
 
 	# Webmail reverse proxy (default route)
-	reverse_proxy 10.0.0.2:8080 {
+	reverse_proxy {$HOME_DEVICE_IP}:8080 {
 		# Forward client headers
 		header_up Host {host}
 		header_up X-Real-IP {remote_host}
@@ -93,7 +93,7 @@
 # Autoconfig subdomain for Thunderbird (autoconfig.example.com)
 {$AUTOCONFIG_DOMAINS:autoconfig.{$RELAY_DOMAIN:example.com}} {
 	handle /mail/config-v1.1.xml {
-		reverse_proxy 10.0.0.2:8090
+		reverse_proxy {$HOME_DEVICE_IP}:8090
 	}
 	handle {
 		respond "DarkPipe Autoconfig" 200
@@ -103,7 +103,7 @@
 # Autodiscover subdomain for Outlook (autodiscover.example.com)
 {$AUTODISCOVER_DOMAINS:autodiscover.{$RELAY_DOMAIN:example.com}} {
 	handle /autodiscover/autodiscover.xml {
-		reverse_proxy 10.0.0.2:8090
+		reverse_proxy {$HOME_DEVICE_IP}:8090
 	}
 	handle {
 		respond "DarkPipe Autodiscover" 200

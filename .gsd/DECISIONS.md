@@ -107,3 +107,7 @@
 - "check-runtime.sh --ci flag skips port 25 check (CI runners have port 25 blocked by cloud provider)"
 - "Podman CI job builds with --format docker to ensure Docker-compatible image format"
 - "podman-compose config in CI is non-fatal (less mature than docker compose config, may have parsing differences)"
+- "Caddyfile uses {$HOME_DEVICE_IP} env var instead of hardcoded 10.0.0.2 — default 10.8.0.2 matches WireGuard subnet (10.8.0.0/24)"
+- "Infrastructure validation is a single orchestration script (scripts/validate-infrastructure.sh) that sequences existing validators — no new validation logic hand-rolled"
+- "Validation script supports --json, --verbose, --dry-run modes for agent and human consumption"
+- "Port 587/993 validation targets tunnel IP (HOME_DEVICE_IP), not cloud relay public IP — these ports are on the home device"
