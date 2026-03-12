@@ -128,4 +128,6 @@ Your email lives on your hardware, encrypted in transit, never stored on someone
 | M005: Design Validation: External Access & Device Connectivity | In Progress | — |
 
 ---
-*Last updated: 2026-03-12 after M004 creation*
+**Website (M004):** Public website at `website/` — Astro 6 + Tailwind CSS 4 static site with hero landing page, features breakdown, quickstart guide, and FAQ. Dark theme with pipe-green accent, WCAG AA accessible, Cloudflare Pages deployment config ready. Build: `cd website && npm run build` → `website/dist/`.
+
+*Last updated: 2026-03-12 after M004 completion*
