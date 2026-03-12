@@ -66,10 +66,23 @@ jobs:
         run: bash scripts/check-runtime.sh --ci
 
       - name: Run validate-infrastructure.sh --dry-run
-        run: bash scripts/validate-infrastructure.sh --dry-run --json | python3 -c "import sys,json; d=json.load(sys.stdin); assert d['overall_status']=='pass', f'Failed: {d[\"overall_status\"]}'; print(f'✅ Infrastructure validation dry-run: {sum(len(s[\"checks\"]) for s in d[\"sections\"].values())} checks passed')"
+        run: |
+          bash scripts/validate-infrastructure.sh --dry-run --json | python3 -c "
+          import sys, json
+          d = json.load(sys.stdin)
+          total = sum(len(s['checks']) for s in d['sections'].values())
+          assert d['overall_status'] == 'pass', 'Failed: ' + d['overall_status']
+          print('Infrastructure validation dry-run: ' + str(total) + ' checks passed')
+          "
 
       - name: Run validate-device-connectivity.sh --dry-run
-        run: bash scripts/validate-device-connectivity.sh --dry-run --json | python3 -c "import sys,json; d=json.load(sys.stdin); assert d['overall_status']=='pass', f'Failed: {d[\"overall_status\"]}'; print(f'✅ Device connectivity dry-run: {d[\"total_checks\"]} checks passed')"
+        run: |
+          bash scripts/validate-device-connectivity.sh --dry-run --json | python3 -c "
+          import sys, json
+          d = json.load(sys.stdin)
+          assert d['overall_status'] == 'pass', 'Failed: ' + d['overall_status']
+          print('Device connectivity dry-run: ' + str(d['total_checks']) + ' checks passed')
+          "
 
   podman-validate:
     name: Podman Build & Compose Validation
