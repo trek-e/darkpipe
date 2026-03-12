@@ -5,7 +5,7 @@
 # Build arguments for OCI labels
 ARG VERSION=dev
 
-FROM stalwartlabs/stalwart:0.15.4
+FROM stalwartlabs/stalwart:v0.15
 
 # Copy custom configuration
 COPY home-device/stalwart/config.toml /opt/stalwart-mail/etc/config.toml
