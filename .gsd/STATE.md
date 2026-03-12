@@ -1,7 +1,7 @@
 # GSD State
 
 **Active Milestone:** M003 — Container Runtime Compatibility
-**Active Slice:** S02 — Runtime-Agnostic Documentation & Tooling
+**Active Slice:** S03 — Apple Containers Support
 **Phase:** planning
 **Requirements Status:** 0 active · 0 validated · 0 deferred · 0 out of scope
 
@@ -17,4 +17,4 @@
 - None
 
 ## Next Action
-Plan slice S02 (Runtime-Agnostic Documentation & Tooling).
+Plan slice S03 (Apple Containers Support).

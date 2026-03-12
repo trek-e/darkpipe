@@ -4,6 +4,10 @@ This guide walks you through deploying DarkPipe from zero to sending and receivi
 
 **Time required:** 30-60 minutes for initial setup, plus 4-6 weeks for IP warmup (gradual sending volume increase for deliverability)
 
+## Container Runtime
+
+All examples in this guide use `docker compose` commands, which you can copy-paste directly. **Podman is fully supported** as an alternative container runtime via `podman-compose` with override files. See the [Podman platform guide](../deploy/platform-guides/podman.md) for setup instructions and key differences.
+
 ## Prerequisites
 
 Before you begin, ensure you have:
@@ -18,9 +22,9 @@ Before you begin, ensure you have:
    - Minimum specs: 1 vCPU, 1GB RAM, 20GB SSD
    - Cost: $3-6/month
 
-3. **A home device running Docker**
+3. **A home device running containers**
    - Raspberry Pi 4+ (4GB+ RAM), OR
-   - Any x64/arm64 Linux system with Docker, OR
+   - Any x64/arm64 Linux system with Docker or Podman, OR
    - NAS platforms: TrueNAS Scale, Unraid, Synology, Proxmox
    - See [platform guides](../deploy/platform-guides/) for your platform
 
@@ -67,6 +71,8 @@ Select a provider that allows port 25 access. See [docs/vps-providers.md](vps-pr
    ```bash
    curl -fsSL https://get.docker.com | sh
    ```
+
+   > **Podman users:** Skip this step. Install Podman 5.3+ and podman-compose instead. See the [Podman platform guide](../deploy/platform-guides/podman.md) for installation and override file setup.
 
 ### 1.3 Verify Port 25 Access
 
@@ -327,6 +333,8 @@ cd cloud-relay
 docker compose up -d
 ```
 
+> **Podman users:** Use `podman-compose` with the override file: `podman-compose -f docker-compose.yml -f docker-compose.podman.yml up -d`. The cloud relay requires rootful Podman for port 25 binding. See the [Podman platform guide](../deploy/platform-guides/podman.md).
+
 Verify services are running:
 ```bash
 docker compose ps
@@ -351,6 +359,8 @@ docker compose --profile stalwart --profile snappymail up -d
 # Example for Postfix+Dovecot + Roundcube + Radicale:
 docker compose --profile postfix-dovecot --profile roundcube --profile radicale up -d
 ```
+
+> **Podman users:** Add `-f docker-compose.podman.yml` after the base compose file. The home device can run rootless. See the [Podman platform guide](../deploy/platform-guides/podman.md).
 
 Verify services are running:
 ```bash

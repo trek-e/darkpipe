@@ -89,9 +89,11 @@ Active in the community? Help other users in [GitHub Discussions](https://github
 ### Prerequisites
 
 - Go 1.25 or later
-- Docker 27+ and Docker Compose v2
+- Docker 24+ and Docker Compose v2, **or** Podman 5.3+ with podman-compose
 - Git
 - A text editor or IDE (VS Code, GoLand, etc.)
+
+Run `bash scripts/check-runtime.sh` to validate your container runtime and development environment prerequisites.
 
 ### Clone the Repository
 

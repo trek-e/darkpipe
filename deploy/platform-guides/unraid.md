@@ -305,8 +305,15 @@ Or use Compose Manager plugin which handles this automatically.
 3. **Set up backups**: Use Unraid appdata backup or rsync to external drive
 4. **Monitor logs**: `docker compose logs -f rspamd` to watch spam filtering
 
+## Alternative Runtimes
+
+Unraid's Docker integration is tightly coupled with its built-in Docker engine and Community Applications ecosystem. Podman is **not applicable** on Unraid — the platform does not support alternative container runtimes. Use the native Docker engine via Community Applications or Docker Compose Manager as described in this guide.
+
+For Podman deployment on supported platforms, see the [Podman Platform Guide](podman.md).
+
 ## See Also
 
+- [Podman Platform Guide](podman.md) - Podman deployment (for supported platforms)
 - [Raspberry Pi Guide](raspberry-pi.md) - Alternative home server platform
 - [TrueNAS Scale Guide](truenas-scale.md) - Similar NAS platform
 - [DarkPipe Setup Tool](../setup/) - Interactive configuration wizard

@@ -352,8 +352,46 @@ iptables -F
 3. **Set up backups**: Configure Proxmox scheduled backups
 4. **Monitor logs**: `docker compose logs -f rspamd` to watch spam filtering
 
+## Using Podman
+
+Podman is a viable alternative to Docker inside an LXC container. Because Podman is daemonless, it can be simpler to set up in unprivileged LXC containers where running a persistent Docker daemon adds complexity.
+
+### Installing Podman in LXC
+
+```bash
+# Debian 12 / Ubuntu 24.04 LXC container
+apt update && apt install -y podman
+
+# Verify
+podman --version
+podman compose version   # requires podman 4.7+ with compose provider
+```
+
+### Why Podman in LXC?
+
+- **No daemon**: Docker requires `dockerd` running inside the container, which needs cgroup delegation and nesting. Podman runs without a daemon, reducing the surface area of LXC configuration.
+- **Rootless option**: If your LXC container runs unprivileged, Podman's native rootless mode is a natural fit. The cloud relay still needs rootful mode for port 25.
+- **Same Compose files**: Use DarkPipe's `docker-compose.yml` directly with `podman compose`.
+
+### Override Files
+
+Use the Podman-specific compose override for volume mount flags and health-check adjustments:
+
+```bash
+podman compose -f docker-compose.yml -f docker-compose.podman.yml up -d
+```
+
+### Runtime Validation
+
+```bash
+bash scripts/check-runtime.sh
+```
+
+For full Podman deployment details — including SELinux, networking, and troubleshooting — see the [Podman Platform Guide](podman.md).
+
 ## See Also
 
+- [Podman Platform Guide](podman.md) - Full Podman deployment reference
 - [Raspberry Pi Guide](raspberry-pi.md) - Alternative home server platform
 - [TrueNAS Scale Guide](truenas-scale.md) - NAS platform
 - [DarkPipe Setup Tool](../setup/) - Interactive configuration wizard

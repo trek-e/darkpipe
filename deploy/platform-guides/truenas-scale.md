@@ -268,8 +268,15 @@ If upgrading is not possible, see the [Proxmox LXC guide](proxmox-lxc.md) for ru
 3. **Set up replication**: Replicate dataset to backup pool or remote TrueNAS
 4. **Monitor logs**: Apps → DarkPipe → Logs
 
+## Alternative Runtimes
+
+TrueNAS Scale 24.10+ uses a native Docker engine for its Custom Apps system. Podman is **not applicable** on TrueNAS Scale — the platform does not support alternative container runtimes. Use the built-in Docker engine via Custom Apps or SSH as described in this guide.
+
+For Podman deployment on supported platforms, see the [Podman Platform Guide](podman.md).
+
 ## See Also
 
+- [Podman Platform Guide](podman.md) - Podman deployment (for supported platforms)
 - [Raspberry Pi Guide](raspberry-pi.md) - Alternative home server platform
 - [Unraid Guide](unraid.md) - Similar NAS platform
 - [DarkPipe Setup Tool](../setup/) - Interactive configuration wizard

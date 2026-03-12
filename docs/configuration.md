@@ -2,6 +2,8 @@
 
 Complete reference for all configurable aspects of DarkPipe.
 
+> **Container Runtime:** All examples use `docker compose` commands. Podman is fully supported via `podman-compose` with override files. See the [Podman platform guide](../deploy/platform-guides/podman.md) for details.
+
 ## Environment Variable Reference Files
 
 Both deployment targets include `.env.example` files documenting all available environment variables with defaults, descriptions, and required/optional markers:
@@ -163,7 +165,7 @@ Redis is configured via `home-device/spam-filter/redis/redis.conf`. No environme
 
 ## Container Security Configuration
 
-All Docker Compose services are configured with security hardening directives by default. These are set in the compose files and generally should not be modified:
+All compose services are configured with security hardening directives by default. These are set in the compose files and generally should not be modified:
 
 - `security_opt: [no-new-privileges:true]` — Prevents privilege escalation
 - `cap_drop: [ALL]` — Drops all Linux capabilities
@@ -175,9 +177,11 @@ All custom Dockerfiles include HEALTHCHECK instructions for container health mon
 
 Run `bash scripts/verify-container-security.sh` to audit these directives.
 
-## Docker Compose Profiles
+## Compose Profiles
 
-DarkPipe uses Docker Compose profiles to select which components to run. Profiles are specified with the `--profile` flag.
+DarkPipe uses compose profiles to select which components to run. Profiles are specified with the `--profile` flag.
+
+> **Podman users:** When using `podman-compose`, add the override file (`-f docker-compose.podman.yml`) to each command. Override files adjust volume mounts and security options for Podman compatibility. See the [Podman platform guide](../deploy/platform-guides/podman.md).
 
 ### Mail Server Profiles
 

@@ -290,8 +290,60 @@ Port 25 blocking affects cloud relay, not home device. Run cloud relay on a VPS 
 3. **Set up backups**: Rsync or Restic to external drive/cloud
 4. **Monitor logs**: `docker compose logs -f rspamd` to watch spam filtering
 
+## Using Podman
+
+Podman is a viable alternative to Docker on Raspberry Pi OS and Ubuntu arm64. If you prefer a daemonless, rootless-capable container runtime, you can run DarkPipe with Podman instead of Docker.
+
+### Installing Podman on Raspberry Pi OS
+
+```bash
+# Raspberry Pi OS (Bookworm) / Debian 12
+sudo apt update && sudo apt install -y podman podman-compose
+
+# Or install podman-compose via pip if the packaged version is too old
+pip3 install podman-compose
+
+# Verify
+podman --version
+podman compose version   # requires podman 4.7+ with compose provider
+```
+
+### Rootful vs Rootless
+
+- **Cloud relay** — Run rootful (`sudo podman compose up -d`). The relay needs to bind port 25, which requires root privileges.
+- **Home device** — Rootless is possible if you don't need privileged ports. Run as your regular user: `podman compose up -d`.
+
+### Override Files
+
+DarkPipe ships Podman-specific compose overrides that adjust volume mounts (`:Z` SELinux labels) and health-check syntax:
+
+```bash
+# Use the Podman override alongside the base compose file
+podman compose -f docker-compose.yml -f docker-compose.podman.yml up -d
+```
+
+### Key Differences from Docker on Pi
+
+| Area | Docker | Podman |
+|------|--------|--------|
+| Daemon | dockerd (always running) | Daemonless (on-demand) |
+| Rootless | Requires configuration | Built-in |
+| Compose | `docker compose` (v2) | `podman compose` (v4.7+) or `podman-compose` |
+| SELinux | N/A on Raspberry Pi OS | N/A on Raspberry Pi OS (relevant if using Fedora) |
+
+### Runtime Validation
+
+Run the DarkPipe runtime check script to verify your Podman installation meets all prerequisites:
+
+```bash
+bash scripts/check-runtime.sh
+```
+
+For full Podman deployment details — including SELinux, networking, and troubleshooting — see the [Podman Platform Guide](podman.md).
+
 ## See Also
 
+- [Podman Platform Guide](podman.md) - Full Podman deployment reference
 - [TrueNAS Scale Guide](truenas-scale.md) - Alternative home server platform
 - [Unraid Guide](unraid.md) - NAS platform with Docker support
 - [DarkPipe Setup Tool](../setup/) - Interactive configuration wizard

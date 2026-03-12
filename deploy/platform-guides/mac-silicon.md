@@ -14,6 +14,8 @@ Deploy DarkPipe on macOS with Apple Silicon (M1/M2/M3/M4) for development and te
 - Docker Desktop for Mac **or** OrbStack
 - Xcode Command Line Tools (for git, etc.)
 
+> **Apple Containers:** macOS 26+ introduces Apple Containers as a native lightweight container runtime. For setup instructions and DarkPipe compatibility, see the [Apple Containers Guide](apple-containers.md) (coming soon).
+
 **Purpose: Development/Testing Only**
 
 DarkPipe on macOS is intended for:

@@ -328,8 +328,15 @@ Upgrade to DSM 7.2+ for native Compose v2 support.
 3. **Set up backups**: Configure Hyper Backup task for darkpipe folder
 4. **Monitor logs**: Container Manager → Container → Logs
 
+## Alternative Runtimes
+
+Synology DSM uses its own Container Manager package, which is built on Docker. Podman is **not applicable** on Synology — the platform does not support installing or running alternative container runtimes. Use Container Manager (Docker) as described in this guide.
+
+For Podman deployment on supported platforms, see the [Podman Platform Guide](podman.md).
+
 ## See Also
 
+- [Podman Platform Guide](podman.md) - Podman deployment (for supported platforms)
 - [Raspberry Pi Guide](raspberry-pi.md) - Alternative home server platform
 - [TrueNAS Scale Guide](truenas-scale.md) - Similar NAS platform
 - [DarkPipe Setup Tool](../setup/) - Interactive configuration wizard

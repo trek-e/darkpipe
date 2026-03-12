@@ -35,7 +35,8 @@ The cloud relay is intentionally designed as a pass-through gateway. Mail arrive
    - All containers run with `no-new-privileges` security option
    - Linux capabilities dropped (`cap_drop: ALL`) with selective re-add only where needed
    - Read-only root filesystems (`read_only: true`) with explicit tmpfs mounts for writable paths
-   - Docker HEALTHCHECK instructions in all custom Dockerfiles
+   - Container HEALTHCHECK instructions in all custom Dockerfiles
+   - Podman's rootless mode provides additional security isolation by running containers without root privileges (see [Podman platform guide](../deploy/platform-guides/podman.md))
 
 6. **PII-safe logging**
    - Email addresses are redacted in logs at default verbosity (e.g., `s***r@example.com`)
@@ -89,7 +90,7 @@ This prevents privilege escalation via setuid/setgid binaries inside containers.
 
 ### Health Checks
 
-All 5 custom Dockerfiles include HEALTHCHECK instructions:
+All 5 custom Dockerfiles include container HEALTHCHECK instructions:
 - **cloud-relay, postfix-dovecot, maddy:** `nc -z localhost 25` (SMTP port check)
 - **stalwart:** `curl --silent --fail http://localhost:8080/` (management API check)
 - **profile-server:** HTTP health endpoint check

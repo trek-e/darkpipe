@@ -49,7 +49,7 @@ Email is one of the most complex internet protocols. Running a mail server tradi
 - Migration from existing providers
 
 **What you still need:**
-- Basic Docker knowledge (docker compose up, logs, restart)
+- Basic container knowledge (docker compose up, logs, restart)
 - Understanding of DNS (or willingness to learn)
 - A VPS with port 25 access (see VPS provider guide)
 - A home device to run Docker (Raspberry Pi, NAS, or Linux PC)
@@ -150,18 +150,16 @@ See [deploy/platform-guides/](../deploy/platform-guides/) for platform-specific 
 
 ### Can I use Podman instead of Docker?
 
-**Probably, but not officially supported.**
+**Yes, fully supported.** DarkPipe works with Podman 5.3+ and podman-compose using the provided override files.
 
-Podman aims for Docker CLI compatibility, including docker-compose (via podman-compose). In theory, DarkPipe should work with Podman.
+See the [Podman platform guide](../deploy/platform-guides/podman.md) for complete setup instructions. Key differences from Docker:
 
-**Not tested:** Maintainers don't test with Podman. You may encounter issues.
+- **Cloud relay requires rootful Podman** — port 25 binding needs root privileges
+- **Home device can run rootless** — additional security isolation over Docker
+- **Override files required** — use `docker-compose.podman.yml` alongside the base compose file to adjust volume mounts and security options
+- **SELinux systems** — override files include `:Z` volume labels for proper SELinux context
 
-**If you try Podman:**
-- Use podman-compose v1.0.3+ (earlier versions had compose file compatibility issues)
-- Expect to troubleshoot networking and volume mount issues
-- Report success or failure in GitHub Discussions to help other users
-
-**For simplicity:** Stick with Docker if you're new to containers.
+Run `bash scripts/check-runtime.sh` to validate your Podman installation meets all prerequisites.
 
 ### How much does it cost?
 

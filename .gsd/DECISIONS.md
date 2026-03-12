@@ -96,3 +96,6 @@
 - "Podman minimum version 5.3.0+ required (host-gateway support)"
 - "Cloud relay requires rootful Podman (port 25 + /dev/net/tun); home device supports rootless with sysctl"
 - "Podman compatibility verified via contract-level compose config validation, not runtime testing (runtime deferred to S04 CI)"
+- "Runtime-agnostic docs use 'generic first, callout when different' pattern — keep docker compose in command examples, add Podman callout blocks for differences (no $RUNTIME variables)"
+- "check-runtime.sh validates system readiness (runtime, version, compose tool, SELinux); verify-podman-compat.sh validates compose file correctness — complementary, not overlapping"
+- "Podman platform guide (deploy/platform-guides/podman.md) is single source of truth; per-component PODMAN.md files remain as operational quick-reference"
