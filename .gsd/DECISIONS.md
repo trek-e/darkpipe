@@ -76,3 +76,8 @@
 - "CLI QR command supports both terminal ASCII art and PNG file export"
 - "Templates and static assets embedded via embed.FS (no runtime file dependencies)"
 - "Integration test suite uses curl and checks for XML structure, PNG magic bytes, and endpoint accessibility"
+- "Container security verification via static bash script analyzing compose/Dockerfile content (no runtime container testing in S01)"
+- "no-new-privileges applied to all compose services — document and skip if empirically proven to break Postfix setuid helpers"
+- "Root containers (relay, postfix-dovecot, stalwart, maddy) hardened with cap_drop ALL + selective cap_add instead of non-root USER"
+- "read_only: true on all compose services with explicit tmpfs for writable paths"
+- "HEALTHCHECK in all 5 custom Dockerfiles for standalone docker run defense-in-depth"

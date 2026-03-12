@@ -20,8 +20,15 @@ LABEL org.opencontainers.image.version=${VERSION}
 LABEL org.opencontainers.image.description="DarkPipe Home Device - Stalwart Mail Server"
 LABEL org.opencontainers.image.licenses=AGPL-3.0
 
+# Install curl for healthcheck (Debian-based image)
+RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+
 # Expose mail server ports
 EXPOSE 25 587 993 8080
+
+# Health check — verify HTTP management interface is responding
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+  CMD curl --silent --fail http://localhost:8080/ || exit 1
 
 # Use entrypoint wrapper instead of direct stalwart-mail binary
 ENTRYPOINT ["/entrypoint-wrapper.sh"]

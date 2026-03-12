@@ -37,7 +37,7 @@ This milestone is complete only when all are true:
 
 ## Slices
 
-- [ ] **S01: Container Security Hardening** `risk:medium` `depends:[]`
+- [x] **S01: Container Security Hardening** `risk:medium` `depends:[]`
   > After this: All 5 Dockerfiles specify non-root USER (or document root justification with cap_drop/security_opt), Docker Compose files include read_only, no-new-privileges, and cap_drop directives.
 - [ ] **S02: Log Hygiene & PII Redaction** `risk:low` `depends:[]`
   > After this: SMTP session logs redact email addresses at default verbosity, token logging is behind a debug flag, and no credentials appear in any log output.

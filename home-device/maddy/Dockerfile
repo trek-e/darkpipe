@@ -27,5 +27,9 @@ LABEL org.opencontainers.image.licenses=AGPL-3.0
 # Expose mail server ports
 EXPOSE 25 587 993
 
+# Health check — verify SMTP is accepting connections
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+  CMD nc -z localhost 25 || exit 1
+
 # Use entrypoint wrapper instead of direct maddy binary
 ENTRYPOINT ["/entrypoint-wrapper.sh"]

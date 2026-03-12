@@ -6,6 +6,16 @@ services:
     image: caddy:2-alpine
     container_name: caddy
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /run
     ports:
       - "80:80"       # HTTP (auto-redirect to HTTPS)
       - "443:443"     # HTTPS
@@ -31,11 +41,31 @@ services:
       timeout: 10s
       retries: 3
 
+  # Root required: Postfix master process needs root for queue management, port 25 binding, and setuid helpers
   relay:
     build:
       context: ..
       dockerfile: cloud-relay/Dockerfile
     container_name: darkpipe-relay
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_ADMIN
+      - NET_BIND_SERVICE
+      - DAC_OVERRIDE
+      - CHOWN
+      - SETGID
+      - SETUID
+      - KILL
+    read_only: true
+    tmpfs:
+      - /var/spool/postfix
+      - /var/lib/postfix
+      - /tmp
+      - /run
+      - /var/run
     ports:
       - "25:25"
     environment:
@@ -98,9 +128,7 @@ services:
       # mTLS certificates (if using mTLS transport)
       # - ./certs:/certs:ro
 
-    # WireGuard support requires NET_ADMIN capability and /dev/net/tun
-    cap_add:
-      - NET_ADMIN
+    # WireGuard support requires /dev/net/tun (NET_ADMIN granted above)
     devices:
       - /dev/net/tun
 

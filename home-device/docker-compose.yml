@@ -27,11 +27,22 @@ version: '3.8'
 
 services:
   # Stalwart mail server (profile: stalwart)
+  # Runs as root: required for privileged port binding (25, 587, 993)
   stalwart:
     image: stalwartlabs/stalwart:0.15.4
     profiles: ["stalwart"]
     container_name: stalwart
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /run
     ports:
       - "25:25"    # SMTP inbound (from cloud relay)
       - "587:587"  # SMTP submission (from mail clients)
@@ -59,11 +70,22 @@ services:
       retries: 3
 
   # Maddy mail server (profile: maddy)
+  # Runs as root: required for privileged port binding (25, 587, 993)
   maddy:
     image: foxcpp/maddy:0.8.2
     profiles: ["maddy"]
     container_name: maddy
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /run
     ports:
       - "25:25"    # SMTP inbound (from cloud relay)
       - "587:587"  # SMTP submission (from mail clients)
@@ -88,6 +110,7 @@ services:
       retries: 3
 
   # Postfix+Dovecot mail server (profile: postfix-dovecot)
+  # Runs as root: required for privileged port binding (25, 587, 993) and mail delivery (chown/setuid/setgid)
   postfix-dovecot:
     build:
       context: ./postfix-dovecot
@@ -95,6 +118,23 @@ services:
     profiles: ["postfix-dovecot"]
     container_name: postfix-dovecot
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+      - DAC_OVERRIDE
+      - CHOWN
+      - SETGID
+      - SETUID
+      - KILL
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /run
+      - /var/spool/postfix
+      - /var/lib/postfix
     ports:
       - "25:25"    # SMTP inbound (from cloud relay)
       - "587:587"  # SMTP submission (from mail clients)
@@ -129,6 +169,15 @@ services:
     profiles: ["roundcube"]
     container_name: roundcube
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /run
+      - /var/tmp
     ports:
       - "8080:80"    # Caddy reverse proxy connects here
     volumes:
@@ -157,6 +206,14 @@ services:
     profiles: ["snappymail"]
     container_name: snappymail
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /run
     ports:
       - "8080:8888"  # SnappyMail internal port is 8888
     volumes:
@@ -189,6 +246,13 @@ services:
     container_name: radicale
     restart: unless-stopped
     init: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /tmp
     ports:
       - "5232:5232"  # Caddy reverse proxy connects here for CalDAV/CardDAV
     volumes:
@@ -215,6 +279,14 @@ services:
     image: rspamd/rspamd:latest
     container_name: rspamd
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /run
     ports:
       - "11334:11334"  # Web UI (optional - for admin access to stats)
     volumes:
@@ -240,6 +312,13 @@ services:
     image: redis:alpine
     container_name: redis
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /tmp
     volumes:
       - ./spam-filter/redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
       - redis-data:/data
@@ -263,6 +342,13 @@ services:
       dockerfile: Dockerfile
     container_name: profile-server
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /tmp
     ports:
       - "8090:8090"
     environment:
