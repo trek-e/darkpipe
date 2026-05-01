@@ -118,3 +118,7 @@
 - "Round-trip verification is human-in-the-loop with helper script (live external email accounts required, cannot be fully automated)"
 - "Device connectivity validation follows validate-infrastructure.sh patterns (--json, --verbose, --dry-run) for consistency across all validation scripts"
 - "Device validation is primarily UAT with automated pre-flight — script checks endpoints are reachable, humans verify actual device behavior"
+- "ADR-0001 accepted: deepen migration seams into source/destination/sync/flow modules (docs/adr/ADR-0001-migration-seams.md)"
+- "ADR-0002 accepted: deepen DNS setup/provider seams with capability-aware adapter and typed per-record apply results (docs/adr/ADR-0002-dns-setup-and-provider-seams.md)"
+- "ADR-0003 accepted: deepen health evaluation seam with normalized snapshot input and triggered-rule output (docs/adr/ADR-0003-health-evaluation-seam.md)"
+- "ADR-0004 accepted: deepen cert lifecycle seam with check->renew->reload orchestration adapters (docs/adr/ADR-0004-cert-lifecycle-seam.md)"
