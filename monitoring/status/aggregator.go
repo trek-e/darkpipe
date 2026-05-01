@@ -12,6 +12,7 @@ import (
 	"github.com/darkpipe/darkpipe/monitoring/delivery"
 	"github.com/darkpipe/darkpipe/monitoring/health"
 	"github.com/darkpipe/darkpipe/monitoring/queue"
+	"github.com/darkpipe/darkpipe/monitoring/status/healtheval"
 )
 
 // SystemStatus represents the complete monitoring state of the DarkPipe system
@@ -22,6 +23,8 @@ type SystemStatus struct {
 	Certificates   CertSummary      `json:"certificates"`
 	Timestamp      time.Time        `json:"timestamp"`
 	OverallStatus  string           `json:"overall_status"` // "healthy", "degraded", "unhealthy"
+	OverallReasons []string         `json:"overall_reasons,omitempty"`
+	TriggeredRules []healtheval.TriggeredRule `json:"triggered_rules,omitempty"`
 }
 
 // HealthSummary contains health check status
@@ -75,6 +78,7 @@ type StatusAggregator struct {
 	queue    func() (*queue.QueueStats, error)
 	delivery DeliveryTracker
 	certs    CertWatcher
+	evaluator healtheval.Module
 }
 
 // NewStatusAggregator creates a new status aggregator with dependency injection
@@ -89,6 +93,7 @@ func NewStatusAggregator(
 		queue:    queueFunc,
 		delivery: deliveryTracker,
 		certs:    certWatcher,
+		evaluator: healtheval.New(healtheval.Policy{}),
 	}
 }
 
@@ -144,8 +149,18 @@ func (s *StatusAggregator) GetStatus(ctx context.Context) (*SystemStatus, error)
 		certSummary.DaysUntilExpiry = int(time.Until(nextExpiry).Hours() / 24)
 	}
 
-	// Compute overall status
-	overall := s.computeOverallStatus(healthSummary, queueSummary, deliverySummary, certSummary)
+	// Compute overall status via evaluation module
+	eval := s.evaluator.Evaluate(healtheval.Snapshot{
+		HealthStatus: healthSummary.Status,
+		Checks: toEvalChecks(healthSummary.Checks),
+		QueueDepth: queueSummary.Depth,
+		QueueStuck: queueSummary.Stuck,
+		Delivered: deliverySummary.Delivered,
+		Deferred: deliverySummary.Deferred,
+		Bounced: deliverySummary.Bounced,
+		Total: deliverySummary.Total,
+		DaysUntilCertExpiry: certSummary.DaysUntilExpiry,
+	})
 
 	return &SystemStatus{
 		Health:        healthSummary,
@@ -153,58 +168,16 @@ func (s *StatusAggregator) GetStatus(ctx context.Context) (*SystemStatus, error)
 		Delivery:      deliverySummary,
 		Certificates:  certSummary,
 		Timestamp:     now,
-		OverallStatus: overall,
+		OverallStatus: eval.Status,
+		OverallReasons: eval.Reasons,
+		TriggeredRules: eval.Triggered,
 	}, nil
 }
 
-// computeOverallStatus determines the overall system health
-// Logic: all healthy = "healthy", any warning = "degraded", any critical = "unhealthy"
-func (s *StatusAggregator) computeOverallStatus(
-	health HealthSummary,
-	queue QueueSummary,
-	delivery DeliverySummary,
-	certs CertSummary,
-) string {
-	// Critical conditions
-	if health.Status == "down" {
-		return "unhealthy"
+func toEvalChecks(in []health.CheckResult) []healtheval.Check {
+	out := make([]healtheval.Check, 0, len(in))
+	for _, c := range in {
+		out = append(out, healtheval.Check{Name: c.Name, Status: c.Status, Message: c.Message})
 	}
-
-	// Check for critical queue issues
-	if queue.Stuck > 0 || queue.Depth > 200 {
-		return "unhealthy"
-	}
-
-	// Check for critical delivery failure rate (>50%)
-	if delivery.Total > 0 {
-		bounceRate := float64(delivery.Bounced) / float64(delivery.Total)
-		if bounceRate > 0.5 {
-			return "unhealthy"
-		}
-	}
-
-	// Check for critical certificate expiry (<= 7 days)
-	if certs.DaysUntilExpiry > 0 && certs.DaysUntilExpiry <= 7 {
-		return "unhealthy"
-	}
-
-	// Warning conditions
-	// Check for warning queue depth
-	if queue.Depth > 50 {
-		return "degraded"
-	}
-
-	// Check for warning certificate expiry (<= 14 days)
-	if certs.DaysUntilExpiry > 0 && certs.DaysUntilExpiry <= 14 {
-		return "degraded"
-	}
-
-	// Check if any health check has warnings
-	for _, check := range health.Checks {
-		if check.Status != "ok" {
-			return "degraded"
-		}
-	}
-
-	return "healthy"
+	return out
 }
