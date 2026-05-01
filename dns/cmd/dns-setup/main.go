@@ -6,7 +6,6 @@ package main
 
 import (
 	"context"
-	"crypto/rsa"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -15,9 +14,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/darkpipe/darkpipe/dns/authtest"
-	"github.com/darkpipe/darkpipe/dns/dkim"
 	"github.com/darkpipe/darkpipe/dns/records"
+	setupmodule "github.com/darkpipe/darkpipe/dns/setup"
 	"github.com/darkpipe/darkpipe/dns/validator"
 	"github.com/fatih/color"
 )
@@ -125,28 +123,26 @@ func runValidateOnly(ctx context.Context) error {
 		return err
 	}
 
-	selector := dkim.GetCurrentSelector(*dkimSelectorPrefix)
-
-	// Create validator
-	checker := validator.NewChecker(nil) // Use default DNS servers
+	m := setupmodule.New()
+	res, err := m.Validate(ctx, setupmodule.ValidateInput{
+		Domain:             *domain,
+		RelayHostname:      *relayHostname,
+		RelayIP:            *relayIP,
+		DKIMSelectorPrefix: *dkimSelectorPrefix,
+	})
+	if err != nil {
+		return err
+	}
 
 	if !*jsonOutput {
 		fmt.Printf("Validating DNS records for %s...\n\n", *domain)
 	}
 
-	// Run all DNS checks
-	report := checker.CheckAll(ctx, *domain, *relayIP, *relayHostname, selector)
-
-	// Check PTR
-	ptrResult := validator.CheckPTR(ctx, *relayIP, *relayHostname)
-
-	// Check SRV records
-	srvResult := checker.CheckSRV(ctx, *domain)
-
-	// Check Autodiscover CNAMEs
-	cnameResult := checker.CheckAutodiscoverCNAMEs(ctx, *domain, *relayHostname)
-
-	allPassed := report.AllPassed && ptrResult.Pass && srvResult.Pass && cnameResult.Pass
+	report := res.Report
+	ptrResult := res.PTR
+	srvResult := res.SRV
+	cnameResult := res.Autodiscover
+	allPassed := res.AllPassed
 
 	// Output results
 	if *jsonOutput {
@@ -187,35 +183,24 @@ func runRotateDKIM(ctx context.Context) error {
 		return err
 	}
 
-	// Generate new selector for next quarter
-	newSelector := dkim.GetNextSelector(*dkimSelectorPrefix)
+	m := setupmodule.New()
+	rot, err := m.RotateDKIM(ctx, setupmodule.RotateInput{
+		Domain:             *domain,
+		DKIMKeyDir:         *dkimKeyDir,
+		DKIMSelectorPrefix: *dkimSelectorPrefix,
+		DKIMKeyBits:        *dkimKeyBits,
+	})
+	if err != nil {
+		return fmt.Errorf("failed to rotate DKIM key: %w", err)
+	}
 
 	fmt.Printf("Rotating DKIM key for %s\n", *domain)
-	fmt.Printf("Current selector: %s\n", dkim.GetCurrentSelector(*dkimSelectorPrefix))
-	fmt.Printf("New selector: %s\n\n", newSelector)
-
-	// Generate new key pair
-	privateKey, err := dkim.GenerateKeyPair(*dkimKeyBits)
-	if err != nil {
-		return fmt.Errorf("failed to generate key pair: %w", err)
-	}
-
-	// Save new key
-	if err := dkim.SaveKeyPair(privateKey, *dkimKeyDir, newSelector); err != nil {
-		return fmt.Errorf("failed to save key pair: %w", err)
-	}
-
+	fmt.Printf("Current selector: %s\n", rot.OldSelector)
+	fmt.Printf("New selector: %s\n\n", rot.NewSelector)
 	fmt.Printf("✓ Generated new DKIM key pair\n")
-	fmt.Printf("  Private key: %s/%s.private.pem\n", *dkimKeyDir, newSelector)
-	fmt.Printf("  Public key: %s/%s.public.pem\n\n", *dkimKeyDir, newSelector)
-
-	// Generate DNS record for new selector
-	publicKeyBase64, err := dkim.PublicKeyBase64(&privateKey.PublicKey)
-	if err != nil {
-		return fmt.Errorf("failed to encode public key: %w", err)
-	}
-
-	dkimRecord := records.GenerateDKIMRecord(*domain, newSelector, publicKeyBase64)
+	fmt.Printf("  Private key: %s/%s.private.pem\n", *dkimKeyDir, rot.NewSelector)
+	fmt.Printf("  Public key: %s/%s.public.pem\n\n", *dkimKeyDir, rot.NewSelector)
+	dkimRecord := rot.Record
 
 	fmt.Printf("Add this DKIM TXT record to your DNS:\n\n")
 	fmt.Printf("Type: TXT\n")
@@ -225,9 +210,9 @@ func runRotateDKIM(ctx context.Context) error {
 	fmt.Printf("Next steps:\n")
 	fmt.Printf("1. Add the new DKIM record to your DNS provider\n")
 	fmt.Printf("2. Wait for DNS propagation (5-15 minutes)\n")
-	fmt.Printf("3. Update your mail server to sign with selector: %s\n", newSelector)
+	fmt.Printf("3. Update your mail server to sign with selector: %s\n", rot.NewSelector)
 	fmt.Printf("4. Wait 7 days for old signatures to expire\n")
-	fmt.Printf("5. Remove the old DKIM record: %s._domainkey.%s\n", dkim.GetCurrentSelector(*dkimSelectorPrefix), *domain)
+	fmt.Printf("5. Remove the old DKIM record: %s._domainkey.%s\n", rot.OldSelector, *domain)
 
 	return nil
 }
@@ -244,70 +229,29 @@ func runFullSetup(ctx context.Context) error {
 		fmt.Printf("Relay: %s (%s)\n\n", *relayHostname, *relayIP)
 	}
 
-	// Step 1: Generate or load DKIM key
-	selector := dkim.GetCurrentSelector(*dkimSelectorPrefix)
-	privateKeyPath := filepath.Join(*dkimKeyDir, selector+".private.pem")
-
-	var privateKey *rsa.PrivateKey
-	var err error
-
-	if _, err := os.Stat(privateKeyPath); os.IsNotExist(err) {
-		// Generate new key
-		if !*jsonOutput {
-			fmt.Printf("Generating DKIM key pair (%d bits)...\n", *dkimKeyBits)
-		}
-
-		key, err := dkim.GenerateKeyPair(*dkimKeyBits)
-		if err != nil {
-			return fmt.Errorf("failed to generate key pair: %w", err)
-		}
-
-		if err := dkim.SaveKeyPair(key, *dkimKeyDir, selector); err != nil {
-			return fmt.Errorf("failed to save key pair: %w", err)
-		}
-
-		privateKey = key
-		if !*jsonOutput {
-			color.Green("✓ Generated DKIM key pair\n")
-			fmt.Printf("  Selector: %s\n", selector)
-			fmt.Printf("  Private key: %s\n", privateKeyPath)
-		}
-	} else {
-		// Load existing key
-		if !*jsonOutput {
-			fmt.Printf("Loading existing DKIM key for selector: %s\n", selector)
-		}
-
-		key, err := dkim.LoadPrivateKey(privateKeyPath)
-		if err != nil {
-			return fmt.Errorf("failed to load private key: %w", err)
-		}
-
-		privateKey = key
-		if !*jsonOutput {
-			color.Green("✓ Loaded existing DKIM key\n")
-		}
-	}
-
-	// Step 2: Generate DNS records
-	publicKeyBase64, err := dkim.PublicKeyBase64(&privateKey.PublicKey)
+	m := setupmodule.New()
+	plan, privateKey, err := m.Plan(ctx, setupmodule.PlanInput{
+		Domain:             *domain,
+		RelayHostname:      *relayHostname,
+		RelayIP:            *relayIP,
+		DKIMKeyDir:         *dkimKeyDir,
+		DKIMSelectorPrefix: *dkimSelectorPrefix,
+		DKIMKeyBits:        *dkimKeyBits,
+		DMARCPolicy:        *dmarcPolicy,
+		DMARCRUA:           *dmarcRua,
+		DMARCRUF:           *dmarcRuf,
+	})
 	if err != nil {
-		return fmt.Errorf("failed to encode public key: %w", err)
+		return fmt.Errorf("failed to build DNS plan: %w", err)
 	}
-
-	allRecords := records.AllRecords{
-		Domain: *domain,
-		SPF:    records.GenerateSPF(*domain, *relayIP, nil),
-		DKIM:   records.GenerateDKIMRecord(*domain, selector, publicKeyBase64),
-		DMARC: records.GenerateDMARC(*domain, records.DMARCOptions{
-			Policy:          *dmarcPolicy,
-			RUA:             *dmarcRua,
-			RUF:             *dmarcRuf,
-		}),
-		MX:                 records.GenerateMX(*domain, *relayHostname, 10),
-		SRV:                records.GenerateSRVRecords(*domain, *relayHostname),
-		AutodiscoverCNAMEs: records.GenerateAutodiscoverCNAME(*domain, *relayHostname),
+	selector := plan.Selector
+	privateKeyPath := filepath.Join(*dkimKeyDir, selector+".private.pem")
+	if !*jsonOutput {
+		color.Green("✓ DKIM material ready\n")
+		fmt.Printf("  Selector: %s\n", selector)
+		fmt.Printf("  Private key: %s\n", privateKeyPath)
 	}
+	allRecords := plan.Records
 
 	// Step 3: Output records
 	if *jsonOutput {
@@ -324,28 +268,35 @@ func runFullSetup(ctx context.Context) error {
 		fmt.Printf("\n✓ DNS records saved to: %s\n", *recordsFile)
 	}
 
-	// Step 5: Validate if --apply was used
+	// Step 5: Apply if requested
 	if *apply {
-		fmt.Println("\nNote: --apply flag set, but automatic DNS record creation is not yet implemented.")
-		fmt.Println("Please add the records manually to your DNS provider.")
-		fmt.Println("Run with --validate-only after adding records to verify.")
+		fmt.Println("\nApplying DNS records via detected provider...")
+		applyRes, err := m.Apply(ctx, plan)
+		if err != nil {
+			if _, ok := err.(setupmodule.ErrManualGuideRequired); ok {
+				color.Yellow("Automatic apply unavailable for detected provider.")
+				fmt.Println("Use generated DNS-RECORDS guide for manual setup.")
+			} else {
+				return fmt.Errorf("failed to apply DNS records: %w", err)
+			}
+		} else {
+			color.Green("✓ Apply complete")
+			fmt.Printf("  Applied: %d\n", applyRes.Applied)
+			fmt.Printf("  Skipped: %d\n", applyRes.Skipped)
+			fmt.Printf("  Failed:  %d\n", applyRes.Failed)
+		}
 	}
 
 	// Step 6: Send test email if requested
 	if *sendTest != "" {
 		fmt.Printf("\nSending test email to %s...\n", *sendTest)
-
-		testCfg := authtest.TestEmailConfig{
-			From:         fmt.Sprintf("test@%s", *domain),
-			To:           *sendTest,
-			RelayHost:    *relayHostname,
-			RelayPort:    25,
-			DKIMKey:      privateKey,
-			DKIMDomain:   *domain,
-			DKIMSelector: selector,
-		}
-
-		if err := authtest.SendTestEmail(ctx, testCfg); err != nil {
+		if err := m.SendAuthTest(ctx, setupmodule.AuthTestInput{
+			Domain:        *domain,
+			RelayHostname: *relayHostname,
+			To:            *sendTest,
+			PrivateKey:    privateKey,
+			Selector:      selector,
+		}); err != nil {
 			color.Red("Failed to send test email: %v\n", err)
 		}
 	}

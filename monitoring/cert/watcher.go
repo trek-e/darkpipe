@@ -9,6 +9,7 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
+	"math"
 	"os"
 	"time"
 )
@@ -86,7 +87,10 @@ func (w *CertWatcher) CheckCert(certPath string) (*CertInfo, error) {
 	daysLeft := int(remaining.Hours() / 24)
 
 	// Determine renewal and alert status
-	shouldRenew := elapsed > time.Duration(float64(lifetime)*w.renewalFraction)
+	// Use rounded day math to avoid boundary flakes from cert timestamp precision.
+	elapsedDays := int(math.Round(elapsed.Hours() / 24))
+	renewDays := int(math.Round((lifetime.Hours() / 24) * w.renewalFraction))
+	shouldRenew := elapsedDays >= renewDays
 	shouldWarn := daysLeft <= w.warnDays
 	shouldCritical := daysLeft <= w.criticalDays
 

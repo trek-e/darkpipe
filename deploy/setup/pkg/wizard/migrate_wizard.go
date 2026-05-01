@@ -7,16 +7,16 @@ package wizard
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/AlecAivazis/survey/v2"
+	"github.com/darkpipe/darkpipe/deploy/setup/pkg/imapsync"
 	"github.com/darkpipe/darkpipe/deploy/setup/pkg/mailmigrate"
+	"github.com/darkpipe/darkpipe/deploy/setup/pkg/migrationsource"
 	"github.com/darkpipe/darkpipe/deploy/setup/pkg/providers"
 	"github.com/emersion/go-imap/v2/imapclient"
 	"github.com/emersion/go-webdav/caldav"
 	"github.com/emersion/go-webdav/carddav"
 	"github.com/pterm/pterm"
-	"golang.org/x/oauth2"
 )
 
 // MigrationConfig holds all configuration for migration wizard
@@ -47,6 +47,11 @@ func RunMigrationWizard(ctx context.Context, cfg *MigrationConfig) error {
 	pterm.DefaultSection.Println("Provider Authentication")
 	if err := runProviderPrompts(ctx, cfg); err != nil {
 		return fmt.Errorf("provider authentication failed: %w", err)
+	}
+
+	// Step 1.5: Show source metadata preview
+	if err := showSourceMetadata(ctx, cfg); err != nil {
+		pterm.Warning.Printf("Could not load source metadata preview: %v\n", err)
 	}
 
 	// Step 2: Connect to source
@@ -88,8 +93,8 @@ func RunMigrationWizard(ctx context.Context, cfg *MigrationConfig) error {
 	folderMapper := mailmigrate.NewFolderMapper(cfg.Provider.Slug(), cfg.FolderMap)
 	folderMapper.LabelsAsFolders = cfg.LabelsAsFolders
 
-	imapSync := mailmigrate.NewIMAPSync(sourceIMAP, destIMAP, state, folderMapper, cfg.StatePath)
-	imapSync.BatchSize = cfg.BatchSize
+	imapSync := imapsync.New(sourceIMAP, destIMAP, state, folderMapper, cfg.StatePath)
+	imapSync.SetBatchSize(cfg.BatchSize)
 
 	var calSync *mailmigrate.CalDAVSync
 	if sourceCalDAV != nil && destCalDAV != nil {
@@ -164,80 +169,60 @@ func RunMigrationWizard(ctx context.Context, cfg *MigrationConfig) error {
 
 // runProviderPrompts executes provider-specific authentication prompts
 func runProviderPrompts(ctx context.Context, cfg *MigrationConfig) error {
-	prompts := cfg.Provider.WizardPrompts()
+	sourceModule := migrationsource.New()
+	return sourceModule.Authenticate(ctx, cfg.Provider)
+}
 
-	for _, prompt := range prompts {
-		switch prompt.Type {
-		case "oauth":
-			// Run OAuth device flow
-			oauthConfig := getOAuthConfig(cfg.Provider)
-			token, err := RunOAuthDeviceFlow(ctx, oauthConfig)
-			if err != nil {
-				return err
-			}
-
-			// Store token in provider (provider must implement token storage)
-			// This is provider-specific and handled by each provider implementation
-			if err := setProviderToken(cfg.Provider, token); err != nil {
-				return err
-			}
-
-		case "input":
-			// Prompt for text input
-			var value string
-			inputPrompt := &survey.Input{
-				Message: prompt.Label,
-				Help:    prompt.HelpText,
-			}
-			if err := survey.AskOne(inputPrompt, &value); err != nil {
-				return err
-			}
-
-			// Store value in provider field
-			if err := setProviderField(cfg.Provider, prompt.Field, value); err != nil {
-				return err
-			}
-
-		case "info":
-			// Display information text
-			pterm.Info.Println(prompt.Label)
-			if prompt.HelpText != "" {
-				fmt.Println(prompt.HelpText)
-				fmt.Println()
-			}
-		}
+func showSourceMetadata(ctx context.Context, cfg *MigrationConfig) error {
+	sourceModule := migrationsource.New()
+	meta, err := sourceModule.DiscoverMetadata(ctx, cfg.Provider)
+	if err != nil {
+		return err
 	}
 
+	pterm.DefaultSection.Println("Source Metadata")
+	fmt.Printf("Provider: %s (%s)\n", meta.ProviderName, meta.ProviderSlug)
+
+	endpointRows := [][]string{{"Endpoint", "Value"}}
+	for _, k := range []string{"imap", "caldav", "carddav"} {
+		v := meta.Endpoints[k]
+		if v == "" {
+			v = "-"
+		}
+		endpointRows = append(endpointRows, []string{k, v})
+	}
+	_ = pterm.DefaultTable.WithHasHeader().WithData(endpointRows).Render()
+
+	capRows := [][]string{{"Capability", "Supported"}}
+	for _, c := range []migrationsource.Capability{
+		migrationsource.CapabilityLabels,
+		migrationsource.CapabilityCalDAV,
+		migrationsource.CapabilityCardDAV,
+		migrationsource.CapabilityAPI,
+	} {
+		capRows = append(capRows, []string{string(c), fmt.Sprintf("%t", meta.Capabilities[c])})
+	}
+	_ = pterm.DefaultTable.WithHasHeader().WithData(capRows).Render()
+
+	if len(meta.Counts) > 0 {
+		countRows := [][]string{{"Metric", "Count"}}
+		for k, v := range meta.Counts {
+			countRows = append(countRows, []string{k, fmt.Sprintf("%d", v)})
+		}
+		_ = pterm.DefaultTable.WithHasHeader().WithData(countRows).Render()
+	}
+	fmt.Println()
 	return nil
 }
 
 // connectToSource connects to source IMAP/CalDAV/CardDAV
 func connectToSource(ctx context.Context, cfg *MigrationConfig) (*imapclient.Client, *caldav.Client, *carddav.Client, error) {
-	// Connect IMAP (always required)
-	imapClient, err := cfg.Provider.ConnectIMAP(ctx)
+	sourceModule := migrationsource.New()
+	adapters, err := sourceModule.OpenAdapters(ctx, cfg.Provider)
 	if err != nil {
-		return nil, nil, nil, fmt.Errorf("IMAP connection failed: %w", err)
+		return nil, nil, nil, err
 	}
-
-	// Connect CalDAV if supported
-	var calDAVClient *caldav.Client
-	if cfg.Provider.SupportsCalDAV() {
-		calDAVClient, err = cfg.Provider.ConnectCalDAV(ctx)
-		if err != nil {
-			pterm.Warning.Printf("CalDAV connection failed (skipping calendars): %v\n", err)
-		}
-	}
-
-	// Connect CardDAV if supported
-	var cardDAVClient *carddav.Client
-	if cfg.Provider.SupportsCardDAV() {
-		cardDAVClient, err = cfg.Provider.ConnectCardDAV(ctx)
-		if err != nil {
-			pterm.Warning.Printf("CardDAV connection failed (skipping contacts): %v\n", err)
-		}
-	}
-
-	return imapClient, calDAVClient, cardDAVClient, nil
+	return adapters.IMAP, adapters.CalDAV, adapters.CardDAV, nil
 }
 
 // promptDestinationCredentials prompts for destination credentials if not provided
@@ -332,12 +317,12 @@ type DryRunResult struct {
 }
 
 // runDryRun executes dry-run for all data types
-func runDryRun(ctx context.Context, cfg *MigrationConfig, imapSync *mailmigrate.IMAPSync, calSync *mailmigrate.CalDAVSync, cardSync *mailmigrate.CardDAVSync) (*DryRunResult, error) {
+func runDryRun(ctx context.Context, cfg *MigrationConfig, imapSync imapsync.Module, calSync *mailmigrate.CalDAVSync, cardSync *mailmigrate.CardDAVSync) (*DryRunResult, error) {
 	result := &DryRunResult{}
 
 	// IMAP dry-run
 	pterm.Info.Println("Scanning IMAP folders...")
-	imapDryRun, err := imapSync.DryRun(ctx)
+	imapDryRun, err := imapSync.Preview(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("IMAP dry-run failed: %w", err)
 	}
@@ -346,7 +331,7 @@ func runDryRun(ctx context.Context, cfg *MigrationConfig, imapSync *mailmigrate.
 	folderData := [][]string{{"Folder", "Messages", "Mapped To", "Status"}}
 	for _, folder := range imapDryRun.Folders {
 		status := "migrate"
-		if folder.WillSkip {
+		if folder.Skipped {
 			status = "skip"
 		}
 		folderData = append(folderData, []string{
@@ -436,7 +421,7 @@ type MigrationResult struct {
 }
 
 // runMigration executes the actual migration with progress bars
-func runMigration(ctx context.Context, cfg *MigrationConfig, imapSync *mailmigrate.IMAPSync, calSync *mailmigrate.CalDAVSync, cardSync *mailmigrate.CardDAVSync, totalFolders int) (*MigrationResult, error) {
+func runMigration(ctx context.Context, cfg *MigrationConfig, imapSync imapsync.Module, calSync *mailmigrate.CalDAVSync, cardSync *mailmigrate.CardDAVSync, totalFolders int) (*MigrationResult, error) {
 	result := &MigrationResult{}
 
 	// Create progress tracker
@@ -445,12 +430,10 @@ func runMigration(ctx context.Context, cfg *MigrationConfig, imapSync *mailmigra
 	progress.SetOverall(totalFolders)
 
 	// Wire up progress callbacks
-	imapSync.OnFolderStart = progress.StartFolder
-	imapSync.OnProgress = progress.UpdateFolder
-	imapSync.OnFolderDone = progress.CompleteFolder
+	imapSync.SetProgressCallbacks(progress.UpdateFolder, progress.StartFolder, progress.CompleteFolder)
 
 	// Run IMAP sync
-	imapResult, err := imapSync.SyncAll(ctx)
+	imapResult, err := imapSync.Execute(ctx)
 	if err != nil {
 		progress.Stop()
 		return nil, fmt.Errorf("IMAP sync failed: %w", err)
@@ -561,57 +544,3 @@ func displayMigrationSummary(result *MigrationResult, statePath string) {
 	}
 }
 
-// Helper functions for provider-specific field setting
-// These work with the provider implementations via type assertions
-
-func getOAuthConfig(provider providers.Provider) *providers.OAuthConfig {
-	// Each OAuth provider (Gmail, Outlook) implements their own OAuth config
-	// Use environment variables for client credentials (per OAuth2 best practices)
-	switch provider.Slug() {
-	case "gmail":
-		return &providers.OAuthConfig{
-			ProviderName:  "Gmail",
-			ClientID:      getEnvOrDefault("GMAIL_CLIENT_ID", ""),
-			ClientSecret:  getEnvOrDefault("GMAIL_CLIENT_SECRET", ""),
-			Scopes:        []string{"https://mail.google.com/", "https://www.googleapis.com/auth/calendar", "https://www.googleapis.com/auth/contacts"},
-			Endpoint:      oauth2.Endpoint{
-				AuthURL:       "https://accounts.google.com/o/oauth2/auth",
-				TokenURL:      "https://oauth2.googleapis.com/token",
-				DeviceAuthURL: "https://oauth2.googleapis.com/device/code",
-			},
-		}
-	case "outlook":
-		return &providers.OAuthConfig{
-			ProviderName:  "Outlook",
-			ClientID:      getEnvOrDefault("OUTLOOK_CLIENT_ID", ""),
-			ClientSecret:  getEnvOrDefault("OUTLOOK_CLIENT_SECRET", ""),
-			Scopes:        []string{"https://outlook.office.com/IMAP.AccessAsUser.All", "Calendars.ReadWrite", "Contacts.ReadWrite", "offline_access"},
-			Endpoint:      oauth2.Endpoint{
-				AuthURL:       "https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
-				TokenURL:      "https://login.microsoftonline.com/common/oauth2/v2.0/token",
-				DeviceAuthURL: "https://login.microsoftonline.com/common/oauth2/v2.0/devicecode",
-			},
-		}
-	default:
-		return nil
-	}
-}
-
-func getEnvOrDefault(key, defaultValue string) string {
-	if value := os.Getenv(key); value != "" {
-		return value
-	}
-	return defaultValue
-}
-
-func setProviderToken(provider providers.Provider, token interface{}) error {
-	// Set OAuth token on provider (type assertion based on provider type)
-	// This is provider-specific
-	return nil // Handled by provider implementation during RunProviderPrompts
-}
-
-func setProviderField(provider providers.Provider, field string, value string) error {
-	// Set field value on provider (type assertion based on provider type)
-	// This is provider-specific
-	return nil // Handled by provider implementation during RunProviderPrompts
-}
