@@ -25,7 +25,9 @@ type RecordApplyResult struct {
 	RecordType string
 	Name       string
 	Action     string // create|update|skip|fail
+	ReasonCode string
 	Reason     string
+	Retryable  bool
 }
 
 type ProviderCapabilities struct {
@@ -72,31 +74,41 @@ func (a *ProviderAdapter) ApplyRecord(ctx context.Context, rec provider.Record) 
 	out := RecordApplyResult{RecordType: rec.Type, Name: rec.Name}
 	if !a.caps.Types[rec.Type] {
 		out.Action = "skip"
+		out.ReasonCode = "unsupported_record_type"
 		out.Reason = ErrUnsupportedRecordType{RecordType: rec.Type}.Error()
+		out.Retryable = false
 		return out
 	}
 
 	existing, err := a.inner.ListRecords(ctx, provider.RecordFilter{Type: rec.Type, Name: rec.Name})
 	if err != nil {
 		out.Action = "fail"
+		out.ReasonCode = "list_failed"
 		out.Reason = err.Error()
+		out.Retryable = true
 		return out
 	}
 	if len(existing) == 0 {
 		if err := a.inner.CreateRecord(ctx, rec); err != nil {
 			out.Action = "fail"
+			out.ReasonCode = "create_failed"
 			out.Reason = err.Error()
+			out.Retryable = true
 			return out
 		}
 		out.Action = "create"
+		out.ReasonCode = "created"
 		return out
 	}
 
 	if err := a.inner.UpdateRecord(ctx, existing[0].ID, rec); err != nil {
 		out.Action = "fail"
+		out.ReasonCode = "update_failed"
 		out.Reason = err.Error()
+		out.Retryable = true
 		return out
 	}
 	out.Action = "update"
+	out.ReasonCode = "updated"
 	return out
 }

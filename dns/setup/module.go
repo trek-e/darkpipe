@@ -57,7 +57,12 @@ type Plan struct {
 	Records  records.AllRecords
 }
 
-type ApplyResult struct{ Applied, Skipped, Failed int }
+type ApplyResult struct {
+	Applied int `json:"applied"`
+	Skipped int `json:"skipped"`
+	Failed  int `json:"failed"`
+	Records []RecordApplyResult `json:"records"`
+}
 
 type ValidateResult struct {
 	AllPassed   bool
@@ -145,9 +150,10 @@ func (m *DefaultModule) Apply(ctx context.Context, plan *Plan) (*ApplyResult, er
 		return nil, err
 	}
 
-	result := &ApplyResult{}
+	result := &ApplyResult{Records: []RecordApplyResult{}}
 	for _, rec := range flattenRecords(plan) {
 		ar := adapter.ApplyRecord(ctx, rec)
+		result.Records = append(result.Records, ar)
 		switch ar.Action {
 		case "create", "update":
 			result.Applied++

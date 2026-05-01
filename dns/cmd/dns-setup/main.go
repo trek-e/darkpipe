@@ -31,6 +31,7 @@ var (
 	validateOnly  = flag.Bool("validate-only", false, "Only validate existing DNS records")
 	rotateDKIM    = flag.Bool("rotate-dkim", false, "Rotate DKIM key (generate new selector)")
 	jsonOutput    = flag.Bool("json", false, "JSON output mode")
+	verboseOutput = flag.Bool("verbose", false, "Verbose output (include per-record apply details)")
 
 	// DKIM flags
 	dkimKeyDir        = flag.String("dkim-key-dir", "/etc/darkpipe/dkim", "DKIM key storage location")
@@ -254,36 +255,61 @@ func runFullSetup(ctx context.Context) error {
 	allRecords := plan.Records
 
 	// Step 3: Output records
-	if *jsonOutput {
-		return records.PrintJSON(os.Stdout, allRecords)
+	if !*jsonOutput {
+		fmt.Println()
+		records.PrintRecords(os.Stdout, allRecords, true)
 	}
 
-	fmt.Println()
-	records.PrintRecords(os.Stdout, allRecords, true)
-
 	// Step 4: Save guide to file
-	if err := records.SaveGuide(*recordsFile, allRecords); err != nil {
-		color.Yellow("Warning: Failed to save DNS records file: %v\n", err)
-	} else {
-		fmt.Printf("\n✓ DNS records saved to: %s\n", *recordsFile)
+	if !*jsonOutput {
+		if err := records.SaveGuide(*recordsFile, allRecords); err != nil {
+			color.Yellow("Warning: Failed to save DNS records file: %v\n", err)
+		} else {
+			fmt.Printf("\n✓ DNS records saved to: %s\n", *recordsFile)
+		}
 	}
 
 	// Step 5: Apply if requested
+	var applyRes *setupmodule.ApplyResult
 	if *apply {
-		fmt.Println("\nApplying DNS records via detected provider...")
-		applyRes, err := m.Apply(ctx, plan)
+		if !*jsonOutput {
+			fmt.Println("\nApplying DNS records via detected provider...")
+		}
+		applyRes, err = m.Apply(ctx, plan)
 		if err != nil {
 			if _, ok := err.(setupmodule.ErrManualGuideRequired); ok {
-				color.Yellow("Automatic apply unavailable for detected provider.")
-				fmt.Println("Use generated DNS-RECORDS guide for manual setup.")
+				if !*jsonOutput {
+					color.Yellow("Automatic apply unavailable for detected provider.")
+					fmt.Println("Use generated DNS-RECORDS guide for manual setup.")
+				}
 			} else {
 				return fmt.Errorf("failed to apply DNS records: %w", err)
 			}
-		} else {
+		} else if !*jsonOutput {
 			color.Green("✓ Apply complete")
 			fmt.Printf("  Applied: %d\n", applyRes.Applied)
 			fmt.Printf("  Skipped: %d\n", applyRes.Skipped)
 			fmt.Printf("  Failed:  %d\n", applyRes.Failed)
+			if *verboseOutput {
+				for _, r := range applyRes.Records {
+					fmt.Printf("  - %s %s %s (%s, retryable=%t)\n", r.Action, r.RecordType, r.Name, r.ReasonCode, r.Retryable)
+				}
+			}
+		}
+	}
+
+	if *jsonOutput {
+		payload := map[string]interface{}{
+			"domain":  allRecords.Domain,
+			"records": allRecords,
+		}
+		if applyRes != nil {
+			payload["apply"] = applyRes
+		}
+		enc := json.NewEncoder(os.Stdout)
+		enc.SetIndent("", "  ")
+		if err := enc.Encode(payload); err != nil {
+			return err
 		}
 	}
 
