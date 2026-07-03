@@ -6,7 +6,7 @@ require (
 	github.com/darkpipe/darkpipe v0.0.0
 	github.com/google/uuid v1.6.0
 	github.com/micromdm/plist v0.2.2
-	golang.org/x/crypto v0.46.0
+	golang.org/x/crypto v0.51.0
 )
 
 require (
@@ -21,9 +21,9 @@ require (
 	github.com/mdlayher/netlink v1.7.2 // indirect
 	github.com/mdlayher/socket v0.5.1 // indirect
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
-	golang.org/x/net v0.48.0 // indirect
+	golang.org/x/net v0.55.0 // indirect
 	golang.org/x/sync v0.19.0 // indirect
-	golang.org/x/sys v0.39.0 // indirect
+	golang.org/x/sys v0.45.0 // indirect
 	golang.zx2c4.com/wireguard v0.0.0-20231211153847-12269c276173 // indirect
 	golang.zx2c4.com/wireguard/wgctrl v0.0.0-20241231184526-a9ab2273dd10 // indirect
 )
